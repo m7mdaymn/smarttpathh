@@ -1,0 +1,279 @@
+<!-- merchant-dashboard.component.html -->
+<div class="merchant-dashboard" dir="rtl">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="merchant-info">
+        <div class="business-logo">
+          <span class="logo-icon">🏢</span>
+        </div>
+        <div class="merchant-details">
+          <h1>{{ merchantData?.businessName }}</h1>
+          <div class="merchant-meta">
+            <span class="location">📍 {{ merchantData?.city }}</span>
+            <span class="plan-badge" [ngClass]="dashboardStats.plan.toLowerCase()">
+              {{ dashboardStats.plan === 'pro' || dashboardStats.plan === 'Pro' ? '⭐ باقة Pro' : 'باقة Basic' }}
+            </span>
+            <span class="subscription-status" [ngClass]="dashboardStats.subscriptionStatus">
+              {{ dashboardStats.subscriptionStatus === 'active' ? '✓ نشط' : '⚠ غير نشط' }}
+            </span>
+          </div>
+          <div class="subscription-expiry" *ngIf="dashboardStats.subscriptionExpiryDate">
+            <span class="expiry-label">تنتهي في:</span>
+            <span class="expiry-date">{{ dashboardStats.subscriptionExpiryDate | date:'yyyy-MM-dd' }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <button class="action-btn scan-btn" (click)="scanQR()">
+          📷 مسح QR
+        </button>
+        <button class="action-btn settings-btn" (click)="navigateTo('settings')">
+          ⚙️ الإعدادات
+        </button>
+        <button class="action-btn logout-btn" (click)="logout()">
+          🚪 تسجيل الخروج
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Quick Stats - Today -->
+  <section class="quick-stats">
+    <h2 class="section-title">📊 إحصائيات اليوم</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <h3>العملاء</h3>
+          <p class="stat-value">{{ dashboardStats.totalCustomers }}</p>
+          <p class="stat-trend positive">+{{ dashboardStats.newCustomersToday }} جديد اليوم</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🚗</div>
+        <div class="stat-content">
+          <h3>غسلات اليوم</h3>
+          <p class="stat-value">{{ dashboardStats.washesToday }}</p>
+          <p class="stat-trend">{{ getTimeAgo(dashboardStats.lastWashTime) }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <h3>إيرادات اليوم</h3>
+          <p class="stat-value">{{ dashboardStats.todayRevenue | number }}</p>
+          <p class="stat-label">ريال سعودي</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-content">
+          <h3>المكافآت</h3>
+          <p class="stat-value">{{ dashboardStats.rewardsGiven }}</p>
+          <p class="stat-trend">{{ dashboardStats.pendingRewards }} قيد الانتظار</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Extended Stats - Weekly & Monthly -->
+  <section class="extended-stats">
+    <h2 class="section-title">📈 الإحصائيات التفصيلية</h2>
+    <div class="stats-grid extended">
+      <div class="stat-card weekly">
+        <div class="stat-header">
+          <span class="stat-icon">📅</span>
+          <h3>هذا الأسبوع</h3>
+        </div>
+        <div class="stat-body">
+          <div class="stat-row">
+            <span class="label">الغسلات:</span>
+            <span class="value">{{ dashboardStats.washesThisWeek }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">الإيرادات:</span>
+            <span class="value highlight">{{ dashboardStats.weeklyRevenue | number }} ريال</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card monthly">
+        <div class="stat-header">
+          <span class="stat-icon">📆</span>
+          <h3>هذا الشهر</h3>
+        </div>
+        <div class="stat-body">
+          <div class="stat-row">
+            <span class="label">الغسلات:</span>
+            <span class="value">{{ dashboardStats.washesThisMonth }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">الإيرادات:</span>
+            <span class="value highlight">{{ dashboardStats.monthlyRevenue | number }} ريال</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-card total">
+        <div class="stat-header">
+          <span class="stat-icon">📊</span>
+          <h3>الإجمالي</h3>
+        </div>
+        <div class="stat-body">
+          <div class="stat-row">
+            <span class="label">إجمالي الغسلات:</span>
+            <span class="value">{{ dashboardStats.totalWashesAllTime }}</span>
+          </div>
+          <div class="stat-row">
+            <span class="label">إجمالي الإيرادات:</span>
+            <span class="value highlight">{{ dashboardStats.totalRevenueAllTime | number }} ريال</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  <!-- Customer Registration QR Section -->
+  <section class="registration-qr-section" *ngIf="registrationQR">
+    <h2 class="section-title">رمز تسجيل العملاء</h2>
+    <div class="qr-card">
+      <div class="qr-preview" (click)="openQRModal()">
+        <img *ngIf="registrationQR.qrCodeBase64" 
+             [src]="registrationQR.qrCodeBase64" 
+             alt="رمز QR للتسجيل" />
+        <div class="qr-overlay">
+          <span>اضغط للتكبير</span>
+        </div>
+      </div>
+      <div class="qr-info">
+        <div class="code-display">
+          <span class="code-label">كود التسجيل:</span>
+          <span class="code-value">{{ registrationQR.registrationCode }}</span>
+          <button class="copy-btn" (click)="copyRegistrationCode()" title="نسخ الكود">
+            📋
+          </button>
+        </div>
+        <p class="qr-hint">يمكن للعميل مسح رمز QR أو إدخال الكود أعلاه للتسجيل</p>
+        <div class="qr-actions">
+          <button class="secondary-btn" (click)="copyRegistrationUrl()">
+            🔗 نسخ رابط التسجيل
+          </button>
+          <button class="secondary-btn" (click)="generateNewQRCode()" [disabled]="isLoadingQR">
+            🔄 تجديد الكود
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Quick Actions -->
+  <section class="quick-actions">
+    <h2 class="section-title">الإجراءات السريعة</h2>
+    <div class="actions-grid">
+
+      <button class="action-card" (click)="viewCustomers()">
+        <div class="action-icon">👥</div>
+        <h3>العملاء</h3>
+        <p>إدارة قائمة العملاء</p>
+      </button>
+
+      <button class="action-card" (click)="scanQR()">
+        <div class="action-icon">📷</div>
+        <h3>مسح QR</h3>
+        <p>سجل غسلة جديدة</p>
+      </button>
+
+      <button class="action-card qr-action" (click)="openQRModal()">
+        <div class="action-icon">📱</div>
+        <h3>رمز التسجيل</h3>
+        <p>رابط تسجيل العملاء</p>
+      </button>
+
+      <!-- <button class="action-card" (click)="viewReports()">
+        <div class="action-icon">📊</div>
+        <h3>التقارير</h3>
+        <p>عرض الإحصائيات</p>
+      </button> -->
+    </div>
+  </section>
+
+  <!-- Loyalty Status -->
+  <section class="loyalty-status">
+    <h2 class="section-title">حالة الولاء</h2>
+    <div class="loyalty-card">
+      <div class="loyalty-header">
+        <h3>إعدادات برنامج الولاء</h3>
+        <button class="edit-btn" (click)="navigateTo('settings')">تعديل</button>
+      </div>
+      
+      <div class="loyalty-details">
+        <div class="detail">
+          <span class="label">المكافأة:</span>
+          <span class="value">{{ loyaltySettings.rewardName }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">الغسلات المطلوبة:</span>
+          <span class="value">{{ loyaltySettings.washesRequired }}</span>
+        </div>
+        <div class="detail">
+          <span class="label">المدة:</span>
+          <span class="value">{{ loyaltySettings.timePeriod }} يوم</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Recent Activity -->
+  <section class="recent-activity">
+    <div class="section-header">
+      <h2 class="section-title">النشاط الأخير</h2>
+      <button class="view-all" (click)="viewAllActivity()">عرض الكل →</button>
+    </div>
+
+    <div class="activity-list">
+      <div class="activity-item" *ngFor="let activity of recentActivity">
+        <div class="activity-icon" [ngClass]="activity.type">
+          <span>{{ activity.type === 'wash' ? '🚗' : 
+                   activity.type === 'customer' ? '👤' : 
+                   activity.type === 'reward' ? '🎁' : '💰' }}</span>
+        </div>
+        <div class="activity-content">
+          <h4>{{ activity.title }}</h4>
+          <p>{{ activity.description }}</p>
+          <span class="activity-time">{{ activity.time }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- QR Modal -->
+  <div class="qr-modal-overlay" *ngIf="showQRModal" (click)="closeQRModal()">
+    <div class="qr-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeQRModal()">✕</button>
+      <h3>رمز تسجيل العملاء</h3>
+      <div class="modal-qr-image">
+        <img *ngIf="registrationQR?.qrCodeBase64 || registrationQR?.qrCodeImage" 
+             [src]="registrationQR?.qrCodeBase64 || registrationQR?.qrCodeImage" 
+             alt="رمز QR للتسجيل" />
+        <div *ngIf="!registrationQR?.qrCodeBase64 && !registrationQR?.qrCodeImage" style="padding: 40px; text-align: center; background: #f5f5f5; border-radius: 8px;">
+          <p>جاري تحميل رمز QR...</p>
+        </div>
+      </div>
+      <div class="modal-code">
+        <span class="code-label">كود التسجيل:</span>
+        <span class="code-value large">{{ registrationQR?.registrationCode }}</span>
+      </div>
+      <p class="modal-hint">اطلب من العميل مسح الرمز أو إدخال الكود للتسجيل في مغسلتك</p>
+      <div class="modal-actions">
+        <button class="primary-btn" (click)="copyRegistrationCode()">📋 نسخ الكود</button>
+        <button class="primary-btn" (click)="copyRegistrationUrl()">🔗 نسخ الرابط</button>
+      </div>
+    </div>
+  </div>
+</div>

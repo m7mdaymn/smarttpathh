@@ -1,0 +1,609 @@
+<!-- customer-dashboard.component.html -->
+<div class="customer-dashboard" dir="rtl">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-container">
+      <div class="user-section">
+        <div class="user-info">
+          <h1 class="user-greeting">اهلا بعودتك , {{ user.name }}</h1>
+          <div class="user-details">
+            <span class="phone">جاهز لتسجيل غسلة جديدة</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="notification-bell-btn" (click)="toggleNotificationModal()" title="الإشعارات">
+          <span class="bell-icon">🔔</span>
+          <span class="notification-badge" *ngIf="unreadNotificationsCount > 0">{{ unreadNotificationsCount }}</span>
+        </button>
+        <button class="logout-btn" (click)="logout()">
+          تسجيل الخروج
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="dashboard-grid">
+      <!-- Left Column: Loyalty Cards & Profile -->
+      <div class="dashboard-column">
+        <!-- Profile Section -->
+        <section class="profile-section">
+          <div class="section-header">
+            <h2>الملف الشخصي</h2>
+          </div>
+          <div class="profile-card">
+            <div class="profile-info">
+              <div class="info-item">
+                <span class="label">الاسم الكامل</span>
+                <span class="value">{{ user.name }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">رقم الهاتف</span>
+                <span class="value">{{ user.phone }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">البريد الإلكتروني</span>
+                <span class="value">{{ user.email }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">رقم اللوحة</span>
+                <span class="value">{{ user.carPlate }}</span>
+              </div>
+            </div>
+            
+            <!-- Car Photo Section - Only show when merchant allows -->
+            <div class="car-photo-section" *ngIf="canUploadCarPhoto()">
+              <div class="section-header">
+                <h3>صورة السيارة</h3>
+                <small class="feature-badge">ميزة احترافية</small>
+              </div>
+              
+              <!-- Active state (when merchant allows) -->
+              <div class="car-photo-container">
+                <!-- Show photo with Add button below it -->
+                <div class="current-photo" *ngIf="user.carPhoto">
+                  <img [src]="user.carPhoto" alt="Car Photo" class="car-photo">
+                  <!-- Only show Add button, not Change button -->
+                  <button class="add-photo-btn" (click)="uploadCarPhoto()" *ngIf="!hasUploadedPhoto">
+                    + إضافة صورة
+                  </button>
+                </div>
+                
+                <!-- Show upload area when no photo exists -->
+                <div class="upload-photo" *ngIf="!user.carPhoto">
+                  <div class="upload-placeholder" (click)="uploadCarPhoto()">
+                    <span class="upload-icon">📷</span>
+                    <span class="upload-text">إضافة صورة السيارة</span>
+                    <span class="upload-hint">(مرة واحدة فقط)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Loyalty Cards Section -->
+        <section class="loyalty-section">
+          <div class="section-header">
+            <h2>بطاقات الولاء</h2>
+            <button class="show-qr-btn" (click)="openLoyaltyQRModal()">
+              📱 عرض رمز QR للغسيل
+            </button>
+          </div>
+          <div class="loyalty-cards-container">
+            <div *ngFor="let card of loyaltyCards" class="loyalty-card">
+              <div class="card-header">
+                <div class="merchant-info">
+                  <h3>{{ card.merchantName }}</h3>
+                  <div class="merchant-details">
+                    <span class="location">📍 {{ card.merchantLocation }}</span>
+                  </div>
+                </div>
+                <div class="card-status">
+                  <span class="status-badge" [class.active]="card.isActive">
+                    {{ card.isActive ? 'نشط' : 'غير نشط' }}
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Progress Section - ALWAYS VISIBLE -->
+              <div class="progress-section">
+                <!-- Car Wash Icons Row -->
+                <div class="wash-icons-row">
+                  <!-- Completed Wash Icons -->
+                  <div *ngFor="let icon of getCompletedWashIcons(card)" 
+                       class="wash-icon completed">
+                    <div class="car-icon">🚗</div>
+                    <div class="soap-bubbles">🫧</div>
+                  </div>
+                  
+                  <!-- Remaining Wash Icons -->
+                  <div *ngFor="let icon of getRemainingWashIcons(card)" 
+                       class="wash-icon remaining">
+                    <div class="car-icon">🚗</div>
+                  </div>
+                </div>
+                
+                <!-- Text Below Icons -->
+                <div class="progress-text-row">
+                  <div class="text-column">
+                    <div class="small-text">المتبقي حتى المكافأة</div>
+                    <div class="large-bold">{{ getRemainingWashes(card) }} غسيلات</div>
+                  </div>
+                  <div class="text-column">
+                    <div class="small-text">المكافأة</div>
+                    <div class="large-bold">{{ card.rewardDescription || 'مكافأة' }}</div>
+                  </div>
+                </div>
+                
+                <!-- Bottom QR Code -->
+                <div class="wash-qr-section">
+                  <div class="qr-code white-qr" (click)="openLoyaltyQRModal()">
+                    <div class="qr-placeholder" *ngIf="!customerQRCode">
+                      <span class="qr-text">QR</span>
+                    </div>
+                    <img *ngIf="customerQRCode" [src]="customerQRCode" alt="Customer QR Code" class="qr-image" />
+                    <p class="qr-hint">{{ user.customerQRCode || 'DP-CUST-...' }}</p>
+                  </div>
+                  
+                  <!-- Export to Wallet Button -->
+                  <button class="export-wallet-btn" (click)="exportToWallet(card)" title="إضافة إلى المحفظة">
+                    <span class="wallet-icon">📲</span>
+                    <span class="wallet-text">إضافة للمحفظة</span>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Reward Section (for redeemable rewards) -->
+              <div *ngIf="card.isRewardAchievable" class="reward-section">
+                <div class="achievable-section">
+                  <button class="show-reward-qr-btn" (click)="showRewardQRForCard(card)">
+                    <span class="qr-icon">🏆</span>
+                    عرض كود المكافأة
+                  </button>
+                  <p class="qr-hint">هذا الكود صالح لاستلام المكافأة: {{ card.rewardDescription }}</p>
+                </div>
+              </div>
+              
+              <!-- Progress Summary -->
+              <div class="progress-summary">
+                <div class="summary-item">
+                  <span class="summary-label">إجمالي الغسلات:</span>
+                  <span class="summary-value">{{ card.totalWashesWithMerchant || 0 }}</span>
+                </div>
+                <div class="summary-item" *ngIf="card.lastWashDate">
+                  <span class="summary-label">آخر زيارة:</span>
+                  <span class="summary-value">{{ card.lastWashDate }}</span>
+                </div>
+                <div class="summary-item" *ngIf="card.daysRemaining">
+                  <span class="summary-label">أيام متبقية:</span>
+                  <span class="summary-value">{{ card.daysRemaining }} يوم</span>
+                </div>
+              </div>
+            </div>
+            
+            <div *ngIf="loyaltyCards.length === 0" class="empty-cards">
+              <div class="empty-icon">🏆</div>
+              <h4>لا توجد بطاقات ولاء</h4>
+              <p>قم بزيارة التاجر للحصول على بطاقة ولاء</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column: Rewards & History -->
+      <div class="dashboard-column">
+        <!-- Rewards Status -->
+        <section class="rewards-section">
+          <div class="section-header">
+            <h2>حالة المكافآت</h2>
+          </div>
+          
+          <!-- Rewards Tabs -->
+          <div class="rewards-tabs">
+            <button class="tab-btn" 
+                    [class.active]="rewardsTab === 'available'"
+                    (click)="setRewardsTab('available')">
+              متاحة ({{ availableRewardsCount }})
+            </button>
+            <button class="tab-btn" 
+                    [class.active]="rewardsTab === 'claimed'"
+                    (click)="setRewardsTab('claimed')">
+              مستخدمة ({{ claimedRewardsCount }})
+            </button>
+            <button class="tab-btn" 
+                    [class.active]="rewardsTab === 'expired'"
+                    (click)="setRewardsTab('expired')">
+              منتهية ({{ expiredRewardsCount }})
+            </button>
+          </div>
+          
+          <div class="rewards-container">
+            <div *ngFor="let reward of filteredRewards" class="reward-card">
+              <div class="reward-header">
+                <div class="reward-icon">{{ getRewardIcon(reward.type) }}</div>
+                <div class="reward-info">
+                  <h4>{{ reward.title }}</h4>
+                  <p class="merchant-name">{{ reward.merchantName }}</p>
+                </div>
+                <span class="reward-status-badge" [class]="reward.status">
+                  {{ getRewardStatusText(reward.status) }}
+                </span>
+              </div>
+              
+              <div class="reward-content">
+                <p class="reward-description">{{ reward.description }}</p>
+                
+                <div class="reward-details">
+                  <span class="expiry">📅 حتى: {{ formatDate(reward.expiresAt) }}</span>
+                  <span class="value" *ngIf="reward.value > 0">{{ reward.value }} ر.س</span>
+                </div>
+              </div>
+              
+              <div class="reward-actions" *ngIf="reward.status === 'available' && !reward.isExpired">
+                <button class="show-qr-btn" (click)="showRewardQR(reward)">
+                  📱 عرض كود QR
+                </button>
+              </div>
+              
+              <div *ngIf="reward.status === 'claimed' && reward.claimedAt" class="used-info">
+                <span class="used-icon">✅</span>
+                <span>تم الاستخدام: {{ formatDate(reward.claimedAt) }}</span>
+              </div>
+            </div>
+            
+            <div *ngIf="filteredRewards.length === 0" class="empty-rewards">
+              <div class="empty-icon">
+                {{ getEmptyIcon() }}
+              </div>
+              <h4>{{ getEmptyTitle() }}</h4>
+              <p>{{ getEmptyMessage() }}</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Wash History -->
+        <section class="history-section">
+          <div class="section-header">
+            <h2>سجل الغسلات</h2>
+            <span class="wash-count" *ngIf="washHistory.length > 0">{{ washHistory.length }} غسلات</span>
+          </div>
+          <div class="history-container">
+            <div class="history-list">
+              <div *ngFor="let wash of washHistory; let i = index" class="history-item" [class.first-item]="i === 0">
+                <div class="wash-info">
+                  <div class="wash-header">
+                    <div class="date-time">
+                      <span class="wash-date">{{ wash.date }}</span>
+                      <span class="wash-time">{{ wash.time }}</span>
+                    </div>
+                    <span class="wash-status" [class.completed]="wash.status === 'completed'" 
+                          [class.pending]="wash.status === 'pending'"
+                          [class.cancelled]="wash.status === 'cancelled'">
+                      {{ wash.status === 'completed' ? '✓ مكتملة' : wash.status === 'pending' ? '⏳ قيد التنفيذ' : '✕ ملغية' }}
+                    </span>
+                  </div>
+                  <div class="wash-merchant">
+                    <span class="merchant-name">{{ wash.merchantName }}</span>
+                  </div>
+                  <div class="wash-services" *ngIf="wash.washType">
+                    <span class="service-icon">🚗</span>
+                    <span class="service-name">{{ wash.washType }}</span>
+                  </div>
+                  <div class="wash-notes" *ngIf="wash.notes">
+                    <span class="notes-label">ملاحظات:</span>
+                    <span class="notes-text">{{ wash.notes }}</span>
+                  </div>
+                </div>
+                <div class="wash-price-section">
+                  <span class="wash-price">{{ wash.price }} ر.س</span>
+                  <span class="discount-badge" *ngIf="wash.discountApplied && wash.discountApplied > 0">
+                    خصم {{ wash.discountApplied }} ر.س
+                  </span>
+                  <div class="rating-section">
+                    <div class="rating-stars" *ngIf="wash.rating">
+                      <span *ngFor="let star of [1,2,3,4,5]" class="star" [class.filled]="star <= wash.rating!">★</span>
+                    </div>
+                    <button class="rate-btn" *ngIf="!wash.rating && wash.status === 'completed'" (click)="openRatingModal(wash)">
+                      ⭐ قيّم
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div *ngIf="washHistory.length === 0" class="empty-history">
+              <div class="empty-icon">🚗</div>
+              <h4>لا توجد غسلات مسجلة</h4>
+              <p>قم بزيارة أحد مغاسل السيارات للبدء في جمع الطوابع</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- DUAL QR MODALS -->
+  
+  <!-- Loyalty QR Modal (Customer QR for washing) -->
+  <div *ngIf="showLoyaltyQRModal" class="qr-modal" (click)="closeLoyaltyQRModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>رمز QR للغسيل</h3>
+        <button class="close-btn" (click)="closeLoyaltyQRModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="qr-display">
+          <!-- Car Photo Section (if available) -->
+          <div class="car-photo-modal-section" *ngIf="user.carPhoto">
+            <div class="car-photo-container-modal">
+              <img [src]="user.carPhoto" alt="صورة السيارة" class="car-photo-modal" />
+            </div>
+            <p class="car-photo-label">🚗 صورة سيارتك</p>
+          </div>
+          
+          <div class="qr-code-container loyalty-qr">
+            <div class="qr-code">
+              <img *ngIf="customerQRCode" 
+                   [src]="customerQRCode" 
+                   alt="Customer QR Code" 
+                   class="qr-image" />
+              <div *ngIf="!customerQRCode" class="qr-placeholder">
+                <span class="qr-text">{{ generateFallbackQR() }}</span>
+              </div>
+            </div>
+            <p class="qr-instruction">أظهر هذا الرمز للتاجر عند الغسيل لكسب الختم</p>
+            <p class="qr-purpose">👆 هذا الكود يضيف ختم لبطاقتك</p>
+          </div>
+          
+          <div class="user-info-modal">
+            <div class="info-item">
+              <span class="label">الاسم:</span>
+              <span class="value">{{ user.name }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">رقم السيارة:</span>
+              <span class="value">{{ user.carPlate }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reward QR Modal (For redeeming rewards) -->
+  <div *ngIf="showRewardQRModal" class="qr-modal reward-modal" (click)="closeRewardQRModal()">
+    <div class="modal-content reward-modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header reward-header">
+        <h3>🏆 كود استبدال المكافأة</h3>
+        <button class="close-btn" (click)="closeRewardQRModal()">✕</button>
+      </div>
+      <div class="modal-body reward-body" *ngIf="selectedReward">
+        <!-- Instruction Header -->
+        <div class="reward-instruction">
+          <p class="instruction-text">👉 أظهر هذا الكود للكاشير لاستلام المكافأة</p>
+        </div>
+        
+        <!-- QR Code Display -->
+        <div class="qr-display reward-qr-display">
+          <div class="qr-code-container reward-qr-container">
+            <div class="qr-code reward-qr-code">
+              <!-- Use API to generate QR image from text code -->
+              <img *ngIf="selectedReward.qrCode" 
+                   [src]="getRewardQRImageUrl(selectedReward.qrCode)" 
+                   alt="Reward QR Code" 
+                   class="qr-image reward-qr-image"
+                   (error)="onQRImageError($event)" />
+              <!-- Fallback when image fails or no QR code -->
+              <div class="qr-fallback-text" [style.display]="selectedReward.qrCode ? 'none' : 'flex'">
+                <span class="qr-code-label">كود المكافأة:</span>
+                <span class="qr-text">{{ selectedReward.qrCode || generateRewardCode(selectedReward) }}</span>
+              </div>
+            </div>
+            <p class="qr-code-text" *ngIf="selectedReward.qrCode">{{ selectedReward.qrCode }}</p>
+          </div>
+        </div>
+        
+        <!-- Warning -->
+        <div class="reward-warning">
+          <span class="warning-icon">⚠️</span>
+          <span class="warning-text">هذا الكود للاستبدال فقط - لا تشاركه مع أحد</span>
+        </div>
+          
+        <!-- Reward Details Section -->
+        <div class="reward-details-section">
+          <div class="detail-row">
+            <span class="detail-icon">🎁</span>
+            <span class="detail-label">نوع المكافأة:</span>
+            <span class="detail-value highlight">{{ selectedReward.title || 'غسلة مجانية' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-icon">🏪</span>
+            <span class="detail-label">المغسلة:</span>
+            <span class="detail-value">{{ selectedReward.merchantName }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-icon">📅</span>
+            <span class="detail-label">تنتهي الصلاحية:</span>
+            <span class="detail-value" [class.expiry-warning]="selectedReward.daysUntilExpiry <= 3">
+              {{ formatDate(selectedReward.expiresAt) }}
+              <span *ngIf="selectedReward.daysUntilExpiry <= 3" class="expiry-badge">
+                {{ selectedReward.daysUntilExpiry === 0 ? 'اليوم!' : 'خلال ' + selectedReward.daysUntilExpiry + ' أيام' }}
+              </span>
+            </span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Car Photo Upload Modal -->
+  <div *ngIf="showPhotoUploadModal" class="photo-modal" (click)="closePhotoUploadModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>رفع صورة السيارة</h3>
+        <button class="close-btn" (click)="closePhotoUploadModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="upload-area" (click)="triggerFileUpload()">
+          <span class="upload-icon">📷</span>
+          <p>انقر لاختيار صورة السيارة</p>
+          <p class="upload-note">(يمكن رفع الصورة مرة واحدة فقط)</p>
+        </div>
+        <input type="file" #fileInput style="display: none;" accept="image/*" (change)="onFileSelected($event)">
+      </div>
+    </div>
+  </div>
+
+  <!-- Wallet Export Modal -->
+  <div *ngIf="showWalletExportModal && selectedCardForExport" class="qr-modal wallet-modal" (click)="closeWalletExportModal()">
+    <div class="modal-content wallet-modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header wallet-header">
+        <h3>📲 إضافة إلى المحفظة</h3>
+        <button class="close-btn" (click)="closeWalletExportModal()">✕</button>
+      </div>
+      <div class="modal-body wallet-body">
+        <!-- Card Preview -->
+        <div class="wallet-card-preview">
+          <div class="preview-card">
+            <div class="preview-merchant">{{ selectedCardForExport.merchantName }}</div>
+            <div class="preview-progress">
+              <span class="progress-label">التقدم:</span>
+              <span class="progress-value">{{ selectedCardForExport.currentStamps }} / {{ selectedCardForExport.requiredStamps }}</span>
+            </div>
+            <div class="preview-reward">{{ selectedCardForExport.rewardDescription }}</div>
+          </div>
+        </div>
+
+        <!-- Export Options -->
+        <div class="wallet-export-options">
+          <button class="export-option-btn download-btn" (click)="downloadCardImage(selectedCardForExport)">
+            <span class="option-icon">💾</span>
+            <span class="option-text">
+              <strong>تحميل صورة البطاقة</strong>
+              <small>احفظها في معرض الصور للوصول السريع</small>
+            </span>
+          </button>
+          
+          <button class="export-option-btn qr-btn" (click)="openLoyaltyQRModal(); closeWalletExportModal()">
+            <span class="option-icon">📱</span>
+            <span class="option-text">
+              <strong>عرض رمز QR</strong>
+              <small>امسح الرمز لإضافته يدوياً للمحفظة</small>
+            </span>
+          </button>
+        </div>
+
+        <!-- Instructions -->
+        <div class="wallet-instructions">
+          <h4>📝 تعليمات الإضافة اليدوية</h4>
+          <div class="instruction-tabs">
+            <div class="instruction-item">
+              <span class="device-icon">🍎</span>
+              <div class="instruction-content">
+                <strong>iPhone (Apple Wallet)</strong>
+                <p>افتح تطبيق الكاميرا → وجهها نحو رمز QR → اضغط على الإشعار</p>
+              </div>
+            </div>
+            <div class="instruction-item">
+              <span class="device-icon">🤖</span>
+              <div class="instruction-content">
+                <strong>Android (Google Wallet)</strong>
+                <p>افتح Google Wallet → اضغط "إضافة" → امسح رمز QR</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating Modal -->
+  <div *ngIf="showRatingModal && selectedWashForRating" class="qr-modal rating-modal" (click)="closeRatingModal()">
+    <div class="modal-content rating-modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>⭐ تقييم الغسلة</h3>
+        <button class="close-btn" (click)="closeRatingModal()">✕</button>
+      </div>
+      <div class="modal-body rating-body">
+        <div class="rating-wash-info">
+          <p class="wash-merchant-name">{{ selectedWashForRating.merchantName }}</p>
+          <p class="wash-date-info">{{ selectedWashForRating.date }} - {{ selectedWashForRating.washType }}</p>
+        </div>
+        
+        <div class="rating-stars-input">
+          <p class="rating-label">كيف كانت تجربتك؟</p>
+          <div class="stars-container">
+            <span *ngFor="let star of [1,2,3,4,5]" 
+                  class="star-input" 
+                  [class.selected]="star <= selectedRating"
+                  [class.hover]="star <= hoverRating"
+                  (click)="setRating(star)"
+                  (mouseenter)="hoverRating = star"
+                  (mouseleave)="hoverRating = 0">
+              ★
+            </span>
+          </div>
+          <p class="rating-hint" *ngIf="selectedRating > 0">
+            {{ getRatingText(selectedRating) }}
+          </p>
+        </div>
+
+        <div class="rating-comment">
+          <label for="ratingComment">تعليق (اختياري):</label>
+          <textarea id="ratingComment" 
+                    [(ngModel)]="ratingComment" 
+                    placeholder="اكتب تعليقك هنا..."
+                    rows="3"></textarea>
+        </div>
+
+        <div class="rating-actions">
+          <button class="submit-rating-btn" 
+                  [disabled]="selectedRating === 0 || isSubmittingRating"
+                  (click)="submitRating()">
+            {{ isSubmittingRating ? 'جاري الإرسال...' : 'إرسال التقييم' }}
+          </button>
+          <button class="cancel-rating-btn" (click)="closeRatingModal()">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Modal -->
+  <div *ngIf="showNotificationModal" class="qr-modal notification-modal" (click)="closeNotificationModal()">
+    <div class="modal-content notification-modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>🔔 الإشعارات</h3>
+        <div class="modal-header-actions">
+          <button *ngIf="unreadNotificationsCount > 0" class="mark-all-read-btn" (click)="markAllAsRead()">
+            تحديد الكل كمقروء
+          </button>
+          <button class="close-btn" (click)="closeNotificationModal()">✕</button>
+        </div>
+      </div>
+      <div class="modal-body notification-body">
+        <div class="notification-list" *ngIf="notifications.length > 0">
+          <div *ngFor="let notification of notifications" 
+               class="notification-item"
+               [class.unread]="!notification.read"
+               (click)="markAsRead(notification)">
+            <div class="notification-icon">{{ notification.icon }}</div>
+            <div class="notification-content">
+              <p class="notification-title">{{ notification.title }}</p>
+              <p class="notification-message">{{ notification.message }}</p>
+              <span class="notification-date">{{ notification.date }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="empty-notifications" *ngIf="notifications.length === 0">
+          <div class="empty-icon">🔔</div>
+          <h4>لا توجد إشعارات</h4>
+          <p>ستظهر هنا إشعاراتك عند حصولك على مكافآت أو تسجيل غسلات</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

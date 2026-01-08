@@ -1,0 +1,38 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build Folders
+bin/
+obj/
+publish/
+Debug/
+Release/
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# npm / frontend
+node_modules/
+dist/
+*.tsbuildinfo
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Others
+temp_migration.sql
+*.bak
+*.backup
+
+# ASP.NET specific
+appsettings*.json
+*.db
+*.mdf

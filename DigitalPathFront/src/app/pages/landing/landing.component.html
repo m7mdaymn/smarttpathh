@@ -1,0 +1,525 @@
+<div class="landing-page" dir="rtl">
+  <!-- Premium Navigation -->
+  <nav class="navbar" [class.scrolled]="isScrolled">
+    <div class="container">
+      <div class="nav-content">
+        <!-- Logo -->
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+              <rect width="40" height="40" rx="8" fill="#2563EB"/>
+              <path d="M12 20L18 26L28 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="20" cy="20" r="8" stroke="white" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="logo-text">
+            <span class="logo-primary">Digital</span>
+            <span class="logo-secondary">Pass</span>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="nav-links">
+          <a (click)="scrollToSection('hero')" class="nav-link">الرئيسية</a>
+          <a (click)="scrollToSection('features')" class="nav-link">المميزات</a>
+          <a (click)="scrollToSection('how-it-works')" class="nav-link">كيف يعمل</a>
+          <a (click)="scrollToSection('pricing')" class="nav-link">الأسعار</a>
+          <a (click)="scrollToSection('contact')" class="nav-link">تواصل معنا</a>
+        </div>
+
+        <!-- Auth Buttons -->
+        <div class="nav-actions">
+          <button 
+            (click)="navigateTo('/auth/signin')"
+            class="btn btn-outline btn-nav"
+          >
+            تسجيل الدخول
+          </button>
+          <button 
+            (click)="navigateTo('/auth/selection')"
+            class="btn btn-primary btn-nav"
+            [@buttonHover]="hoverState['register'] ? 'hover' : 'initial'"
+            (mouseenter)="setHoverState('register', true)"
+            (mouseleave)="setHoverState('register', false)"
+          >
+            ابدأ الآن
+          </button>
+        </div>
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero-section">
+    <div class="container">
+      <div class="hero-content">
+        <!-- Left Column - Text -->
+        <div class="hero-text" @heroTextAnimation>
+
+          
+          <h1 class="hero-title">
+            حوّل زبونك إلى 
+            <span class="highlight-text">عميل دائم</span>
+            ومتحمس…
+          </h1>
+          
+          <p class="hero-subtitle">
+            وكأن مافيه في هالبلد إلا مغسلة هالولد
+          </p>
+                    <div class="hero-badge">
+            <span class="badge-text">نظام ولاء ذكي</span>
+          </div>
+          
+          <p class="hero-description">
+            نظام ولاء ذكي مخصص لمغاسل السيارات يعتمد على الولاء الزمني 
+            وبطاقة رقمية بصورة سيارة العميل داخل Wallet
+          </p>
+
+          <!-- Features List -->
+          <div class="hero-features">
+            <div class="feature-item">
+              <div class="feature-icon">✓</div>
+              <span>بطاقة ولاء تحفظ مباشرة في جوال العميل (بدون تطبيق)</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">✓</div>
+              <span>أنت تحدد عدد الغسلات والمدة لاستلام المكافأة</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">✓</div>
+              <span>تذكير ذكي للعميل وقت ما يكون قريب منك</span>
+            </div>
+          </div>
+
+          <!-- CTA Buttons -->
+          <div class="hero-actions">
+            <button 
+              (click)="navigateTo('/auth/selection')"
+              class="btn btn-primary btn-hero"
+              [@buttonHover]="hoverState['heroPrimary'] ? 'hover' : 'initial'"
+              (mouseenter)="setHoverState('heroPrimary', true)"
+              (mouseleave)="setHoverState('heroPrimary', false)"
+            >
+              ابدأ الآن – وخل العميل يرجع لك
+            </button>
+            <button 
+              (click)="handleWhatsApp()"
+              class="btn btn-secondary btn-hero"
+              [@buttonHover]="hoverState['heroSecondary'] ? 'hover' : 'initial'"
+              (mouseenter)="setHoverState('heroSecondary', true)"
+              (mouseleave)="setHoverState('heroSecondary', false)"
+            >
+              <span class="whatsapp-icon">💬</span>
+              شوف كيف يشتغل النظام
+            </button>
+          </div>
+
+          <p class="hero-note">
+            مناسب لمغاسل السيارات • إعداد سريع • بدون التزام طويل
+          </p>
+        </div>
+
+        <!-- Right Column - Illustration -->
+        <div class="hero-illustration" @fadeIn>
+          <div class="illustration-container">
+            <div class="phone-mockup">
+              <div class="phone-screen">
+                <div class="screen-content">
+                  <div class="app-header">
+                    <div class="app-title">بطاقة الولاء</div>
+                  </div>
+                  <div class="car-image">
+                    <div class="car"></div>
+                  </div>
+                  <div class="progress-section">
+                    <div class="progress-label">
+                      <span>5 غسلات</span>
+                      <span>متبقي 2</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill"></div>
+                    </div>
+                  </div>
+                  <div class="qr-section">
+                    <div class="qr-code"></div>
+                    <div class="qr-text">امسح للغسيل</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section" @fadeIn>
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">+500</div>
+          <div class="stat-label">مغسلة تستخدم النظام</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">+50K</div>
+          <div class="stat-label">عميل راضي</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">+2M</div>
+          <div class="stat-label">غسلة تمت</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">98%</div>
+          <div class="stat-label">رضا العملاء</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="features-section">
+    <div class="container">
+      <div class="section-header" @slideInLeft>
+        <div class="section-badge">المميزات</div>
+        <h2 class="section-title">كيف يشتغل نظام Digital Pass؟</h2>
+        <p class="section-subtitle">ثلاث خطوات بسيطة… بدون تدريب، بدون تعقيد.</p>
+      </div>
+
+      <div class="features-grid" @featureAnimation>
+        <div class="feature-card">
+          <div class="feature-card-inner">
+            <div class="feature-number">01</div>
+            <div class="feature-icon">📝</div>
+            <h3 class="feature-title">سجّل وأنشئ بطاقة الولاء</h3>
+            <p class="feature-description">
+              تدخل بيانات مغسلتك<br/>
+              تحدد عدد الغسلات + المدة<br/>
+              ويتم إنشاء بطاقة ولاء رقمية جاهزة فوراً.
+            </p>
+            <div class="feature-decoration"></div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-inner">
+            <div class="feature-number">02</div>
+            <div class="feature-icon">📸</div>
+            <h3 class="feature-title">امسح – صوّر – سجّل</h3>
+            <p class="feature-description">
+              العامل يمسح QR من جوال العميل<br/>
+              تفتح الكاميرا تلقائياً<br/>
+              يتم تصوير السيارة وتسجيل الغسلة فوراً.
+            </p>
+            <div class="feature-decoration"></div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-inner">
+            <div class="feature-number">03</div>
+            <div class="feature-icon">💳</div>
+            <h3 class="feature-title">البطاقة تدخل المحفظة</h3>
+            <p class="feature-description">
+              العميل يضيف البطاقة بضغطة واحدة<br/>
+              تظهر صورة سيارته كأيقونة داخل Wallet<br/>
+              ويشوف التقدم والمكافأة بوضوح.
+            </p>
+            <div class="feature-decoration"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="how-it-works-section">
+    <div class="container">
+      <div class="section-header" @slideInRight>
+        <div class="section-badge">كيف يعمل</div>
+        <h2 class="section-title">كل شيء يتم من الجوال</h2>
+        <p class="section-subtitle">بدون تطبيق • بدون أجهزة إضافية</p>
+      </div>
+
+      <div class="works-steps">
+        <div class="step-card" @slideInLeft>
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>بطاقة في جوال العميل</h3>
+            <p>العميل يحفظ البطاقة مباشرة في تطبيق Wallet بدون تحميل أي تطبيق إضافي</p>
+          </div>
+          <div class="step-illustration">
+            <div class="illustration-phone">
+              <div class="illustration-screen"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-card" @slideInRight>
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>تحكم كامل في العروض</h3>
+            <p>تحدد عدد الغسلات والمدة بنفسك حسب رغبتك وتفضيلات عملائك</p>
+          </div>
+          <div class="step-illustration">
+            <div class="illustration-dashboard"></div>
+          </div>
+        </div>
+
+        <div class="step-card" @slideInLeft>
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>تذكيرات ذكية</h3>
+            <p>تذكير تلقائي للعميل عندما يكون قريب من مغسلتك أو يقترب من استلام مكافأته</p>
+          </div>
+          <div class="step-illustration">
+            <div class="illustration-notification"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section id="pricing" class="pricing-section">
+    <div class="container">
+      <div class="section-header" @slideInLeft>
+        <div class="section-badge">الأسعار</div>
+        <h2 class="section-title">الباقات المخصصة لمغاسل السيارات</h2>
+        <p class="section-subtitle">اختر الباقة المناسبة وابدأ خلال دقائق — شهري أو سنوي</p>
+      </div>
+
+      <div class="pricing-cards">
+        <!-- Basic Plan -->
+        <div class="pricing-card" @slideInRight>
+          <div class="plan-header">
+            <h3 class="plan-title">Basic Wash</h3>
+            <p class="plan-subtitle">للمغسلة الواحدة – بداية ذكية بدون مخاطرة</p>
+            <div class="plan-price">
+              <span class="amount">99</span>
+              <span class="period">ريال / شهريًا</span>
+            </div>
+            <p class="plan-save">999 ريال / سنويًا (توفير 20%)</p>
+          </div>
+          
+          <div class="plan-features">
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>بطاقة ولاء رقمية (Apple Wallet + Google Wallet)</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>QR Code واحد للمغسلة</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>نظام ولاء بزمن محدد</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>عداد غسلات داخل البطاقة</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>لوحة تحكم بسيطة</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>حتى 50 مستخدم</span>
+            </div>
+          </div>
+
+          <button 
+            (click)="navigateTo('/auth/selection')"
+            class="btn btn-outline btn-block"
+            [@buttonHover]="hoverState['pricingBasic'] ? 'hover' : 'initial'"
+            (mouseenter)="setHoverState('pricingBasic', true)"
+            (mouseleave)="setHoverState('pricingBasic', false)"
+          >
+            اشترك الآن
+          </button>
+        </div>
+
+        <!-- Pro Plan (Recommended) -->
+        <div class="pricing-card recommended" @slideInLeft>
+          <div class="plan-badge">الأكثر طلباً</div>
+          <div class="plan-header">
+            <h3 class="plan-title">Pro Wash</h3>
+            <p class="plan-subtitle">للمغاسل الجادة اللي تبغى تتحكم وتكسب</p>
+            <div class="plan-price">
+              <span class="amount">149</span>
+              <span class="period">ريال / شهريًا</span>
+            </div>
+            <p class="plan-save">1499 ريال / سنويًا (توفير 16%)</p>
+          </div>
+          
+          <div class="plan-features">
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>كل ما في Basic + مميزات إضافية</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>ولاء بزمن مرن</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>تصوير سيارة العميل وربطها كأيقونة</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>إشعارات </span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>تقارير متقدمة وتحليلات</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-check">✓</div>
+              <span>عدد مستخدمين غير محدود</span>
+            </div>
+          </div>
+
+          <button 
+            (click)="navigateTo('/auth/selection')"
+            class="btn btn-primary btn-block"
+            [@buttonHover]="hoverState['pricingPro'] ? 'hover' : 'initial'"
+            (mouseenter)="setHoverState('pricingPro', true)"
+            (mouseleave)="setHoverState('pricingPro', false)"
+          >
+            فعّل باقة Pro
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section id="contact" class="cta-section" @fadeIn>
+    <div class="container">
+      <div class="cta-card">
+        <div class="cta-content">
+          <h2 class="cta-title">خِلنا نجهز نظام الولاء لمغسلتك</h2>
+          <p class="cta-subtitle">
+            اكتب بياناتك، ويرجع لك بعرض مناسب خلال وقت قصير.
+          </p>
+          
+          <div class="cta-actions">
+            <button 
+              (click)="navigateTo('/auth/selection')"
+              class="btn btn-primary btn-cta"
+              [@buttonHover]="hoverState['ctaPrimary'] ? 'hover' : 'initial'"
+              (mouseenter)="setHoverState('ctaPrimary', true)"
+              (mouseleave)="setHoverState('ctaPrimary', false)"
+            >
+              ابدأ الآن
+            </button>
+            <button 
+              (click)="handleWhatsApp()"
+              class="btn btn-secondary btn-cta"
+              [@buttonHover]="hoverState['ctaWhatsapp'] ? 'hover' : 'initial'"
+              (mouseenter)="setHoverState('ctaWhatsapp', true)"
+              (mouseleave)="setHoverState('ctaWhatsapp', false)"
+            >
+              <span class="whatsapp-icon">💬</span>
+              واتساب مباشر
+            </button>
+          </div>
+          
+          <div class="contact-info">
+            <div class="contact-item">
+              <span class="contact-icon">📞</span>
+              <a href="tel:0548290509" class="contact-link">0548290509</a>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">✉️</span>
+              <a href="mailto:infodigitalpass.com" class="contact-link">infodigitalpass.com</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" @fadeIn>
+    <div class="container">
+      <div class="footer-content">
+        <!-- Logo and Description -->
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <div class="logo-icon">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="6" fill="#2563EB"/>
+                <path d="M10 16L14 20L22 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="16" cy="16" r="6" stroke="white" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <span class="logo-primary">Digital</span>
+              <span class="logo-secondary">Pass</span>
+            </div>
+          </div>
+          <p class="footer-description">
+            نظام ولاء ذكي مخصص لمغاسل السيارات، يحول زبونك إلى عميل دائم ومتحمس.
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-links">
+          <h3 class="links-title">روابط سريعة</h3>
+          <a (click)="scrollToSection('hero')" class="footer-link">الرئيسية</a>
+          <a (click)="scrollToSection('features')" class="footer-link">المميزات</a>
+          <a (click)="scrollToSection('how-it-works')" class="footer-link">كيف يعمل</a>
+          <a (click)="scrollToSection('pricing')" class="footer-link">الأسعار</a>
+          <a (click)="scrollToSection('contact')" class="footer-link">تواصل معنا</a>
+        </div>
+
+        <!-- Account Links -->
+        <div class="footer-links">
+          <h3 class="links-title">الحساب</h3>
+          <a (click)="navigateTo('/auth/signin')" class="footer-link">تسجيل الدخول</a>
+          <a (click)="navigateTo('/auth/selection')" class="footer-link">إنشاء حساب</a>
+          <a (click)="navigateTo('/auth/customer-register')" class="footer-link">تسجيل كعميل</a>
+          <a (click)="navigateTo('/auth/merchant-register')" class="footer-link">تسجيل كتاجر</a>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="footer-contact">
+          <h3 class="links-title">تواصل معنا</h3>
+          <div class="contact-item">
+            <span class="contact-icon">📍</span>
+            <span>الرياض، المملكة العربية السعودية</span>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">📞</span>
+            <a href="tel:0548290509" class="contact-link">0548290509</a>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">✉️</span>
+            <a href="mailto:info@digitalpass.com" class="contact-link">infodigitalpass.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright">
+          © 2026 Digital Pass. جميع الحقوق محفوظة.
+          <span class="separator">•</span>
+          عميلك في جيبك
+        </p>
+        <div class="security-badge">
+          <span class="security-icon">🔒</span>
+          <span>بياناتك محفوظة ولن يتم مشاركتها مع أي طرف</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>

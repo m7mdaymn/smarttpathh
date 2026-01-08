@@ -1,0 +1,277 @@
+<div class="super-admin-dashboard" dir="rtl">
+  <!-- Header with Premium Design -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-main">
+        <div class="logo-section">
+          <div class="admin-badge">
+            <h1 class="badge-text">لوحة تحكم المنصة</h1>
+          </div>
+          <div class="header-titles">
+            <p class="subtitle">نظام إدارة مغاسل السيارات الذكي</p>
+          </div>
+        </div>
+        <div class="header-stats">
+          <div class="action-buttons">
+            <!-- <button class="header-btn back-btn" (click)="goBack()">← العودة</button> -->
+            <button class="header-btn logout-btn" (click)="logout()">🚪 تسجيل الخروج</button>
+          </div>
+          <div class="live-stats">
+            <span class="live-dot"></span>
+            <span class="live-text">نظام نشط</span>
+          </div>
+          <div class="current-time">
+            <span class="time-icon">🕒</span>
+            <span>{{ currentTime }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SaaS Revenue Section -->
+  <section class="saas-revenue-section">
+    <div class="section-header">
+      <h2 class="section-title">💰 إيرادات الاشتراكات (SaaS)</h2>
+      <p class="section-subtitle">إحصائيات الدخل من الاشتراكات</p>
+    </div>
+    
+    <div class="stats-grid">
+      <!-- Monthly SaaS Revenue -->
+      <div class="stat-card saas-monthly" @cardAnimation>
+        <div class="card-icon">💵</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">إيرادات هذا الشهر</h3>
+          </div>
+          <div class="card-value">{{ systemData.totalSaaSRevenueThisMonth | number:'1.0-0' }} <span class="currency">ريال</span></div>
+        </div>
+      </div>
+
+      <!-- All Time SaaS Revenue -->
+      <div class="stat-card saas-total" @cardAnimation>
+        <div class="card-icon">💰</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">إجمالي الإيرادات</h3>
+          </div>
+          <div class="card-value">{{ systemData.totalSaaSRevenueAllTime | number:'1.0-0' }} <span class="currency">ريال</span></div>
+        </div>
+      </div>
+
+      <!-- Growth Rate -->
+      <div class="stat-card growth-card" @cardAnimation>
+        <div class="card-icon">📈</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">نسبة النمو الشهري</h3>
+          </div>
+          <div class="card-value" [class.positive]="systemData.stats.monthlyGrowth >= 0" [class.negative]="systemData.stats.monthlyGrowth < 0">
+            {{ systemData.stats.monthlyGrowth >= 0 ? '+' : '' }}{{ systemData.stats.monthlyGrowth | number:'1.1-1' }}%
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Wash Revenue Section (Merchants' Earnings) -->
+  <section class="wash-revenue-section">
+    <div class="section-header">
+      <h2 class="section-title">🚗 إيرادات الغسلات (المتاجر)</h2>
+      <p class="section-subtitle">إجمالي ما تكسبه المتاجر من الغسلات</p>
+    </div>
+    
+    <div class="stats-grid">
+      <!-- Monthly Wash Revenue -->
+      <div class="stat-card wash-monthly" @cardAnimation>
+        <div class="card-icon">🚿</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">إيرادات الغسلات هذا الشهر</h3>
+          </div>
+          <div class="card-value">{{ systemData.totalWashRevenueThisMonth | number:'1.0-0' }} <span class="currency">ريال</span></div>
+        </div>
+      </div>
+
+      <!-- All Time Wash Revenue -->
+      <div class="stat-card wash-total" @cardAnimation>
+        <div class="card-icon">💎</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">إجمالي إيرادات الغسلات</h3>
+          </div>
+          <div class="card-value">{{ systemData.totalWashRevenueAllTime | number:'1.0-0' }} <span class="currency">ريال</span></div>
+        </div>
+      </div>
+
+      <!-- Average Wash Price -->
+      <div class="stat-card avg-price-card" @cardAnimation>
+        <div class="card-icon">📊</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">متوسط سعر الغسلة</h3>
+          </div>
+          <div class="card-value">{{ systemData.avgWashPrice | number:'1.0-0' }} <span class="currency">ريال</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Merchants Statistics -->
+  <section class="merchants-stats-section">
+    <div class="section-header">
+      <h2 class="section-title">🏪 إحصائيات المتاجر</h2>
+      <p class="section-subtitle">نظرة على حالة المتاجر المسجلة</p>
+    </div>
+    
+    <div class="stats-grid">
+      <!-- Total Merchants -->
+      <div class="stat-card merchants-card" @cardAnimation>
+        <div class="card-icon">🏢</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">إجمالي المتاجر</h3>
+          </div>
+          <div class="card-value">{{ systemData.totalMerchants }}</div>
+          <div class="card-trend positive">+{{ systemData.newMerchantsThisMonth }} هذا الشهر</div>
+        </div>
+      </div>
+
+      <!-- Active Merchants -->
+      <div class="stat-card active-card" @cardAnimation>
+        <div class="card-icon">✅</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">متاجر نشطة</h3>
+          </div>
+          <div class="card-value">{{ systemData.activeMerchants }}</div>
+        </div>
+      </div>
+
+      <!-- Inactive Merchants -->
+      <div class="stat-card inactive-card" @cardAnimation>
+        <div class="card-icon">⏸️</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">متاجر غير نشطة</h3>
+          </div>
+          <div class="card-value">{{ systemData.inactiveMerchants }}</div>
+        </div>
+      </div>
+
+      <!-- Basic Plan -->
+      <div class="stat-card basic-plan-card" @cardAnimation>
+        <div class="card-icon">📦</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">باقة Basic</h3>
+          </div>
+          <div class="card-value">{{ systemData.basicPlanCount }}</div>
+        </div>
+      </div>
+
+      <!-- Pro Plan -->
+      <div class="stat-card pro-plan-card" @cardAnimation>
+        <div class="card-icon">⭐</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">باقة Pro</h3>
+          </div>
+          <div class="card-value">{{ systemData.proPlanCount }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Customers Statistics -->
+  <section class="customers-stats-section">
+    <div class="section-header">
+      <h2 class="section-title">👥 إحصائيات العملاء</h2>
+      <p class="section-subtitle">بيانات العملاء المسجلين</p>
+    </div>
+    
+    <div class="stats-grid">
+      <!-- Total Customers -->
+      <div class="stat-card customers-card" @cardAnimation>
+        <div class="card-icon">👤</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">إجمالي العملاء</h3>
+          </div>
+          <div class="card-value">{{ systemData.totalCustomers | number }}</div>
+          <div class="card-trend positive">+{{ systemData.newCustomersThisMonth }} هذا الشهر</div>
+        </div>
+      </div>
+
+      <!-- Total Washes -->
+      <div class="stat-card washes-card" @cardAnimation>
+        <div class="card-icon">🚗</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">إجمالي الغسلات</h3>
+          </div>
+          <div class="card-value">{{ systemData.totalWashesAllTime | number }}</div>
+          <div class="card-trend">{{ systemData.totalWashesThisMonth | number }} هذا الشهر</div>
+        </div>
+      </div>
+
+      <!-- Rewards Given -->
+      <div class="stat-card rewards-card" @cardAnimation>
+        <div class="card-icon">🎁</div>
+        <div class="card-content">
+          <div class="card-header">
+            <h3 class="card-title">المكافآت الممنوحة</h3>
+          </div>
+          <div class="card-value">{{ systemData.totalRewardsGiven | number }}</div>
+          <div class="card-trend">{{ systemData.totalRewardsClaimed | number }} تم استخدامها</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recent Activity Section -->
+  <section class="activity-section" *ngIf="recentActivity.length > 0">
+    <div class="section-header">
+      <h2 class="section-title">📋 النشاط الأخير</h2>
+      <p class="section-subtitle">آخر الأنشطة في المنصة</p>
+    </div>
+    
+    <div class="activity-list">
+      <div class="activity-item" *ngFor="let activity of recentActivity" @cardAnimation>
+        <div class="activity-icon">{{ activity.icon }}</div>
+        <div class="activity-content">
+          <h4>{{ activity.title }}</h4>
+          <p>{{ activity.description }}</p>
+        </div>
+        <div class="activity-meta">
+          <span class="activity-time">{{ activity.time }}</span>
+          <span class="activity-status" [ngClass]="activity.status">{{ activity.statusText }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Actions -->
+  <section class="actions-section">
+    <div class="section-header">
+      <h2 class="section-title">الإجراءات السريعة</h2>
+      <p class="section-subtitle">إدارة المنصة بسهولة</p>
+    </div>
+    
+    <div class="actions-grid">
+      <button class="action-card" (click)="navigateTo('merchant-details')">
+        <div class="action-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M3 9H21" stroke="currentColor" stroke-width="2"/>
+            <path d="M9 21V9" stroke="currentColor" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3 class="action-title">المتاجر</h3>
+        <p class="action-desc">إدارة مغاسل السيارات</p>
+        <span class="action-badge">{{ systemData.totalMerchants }} متجر</span>
+      </button>
+    </div>
+  </section>
+
+</div>

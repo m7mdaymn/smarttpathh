@@ -1,0 +1,130 @@
+<div class="selection-page" dir="rtl">
+  <div class="container">
+    <!-- Header -->
+    <header class="selection-header" @fadeIn>
+      <button (click)="goBack()" class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M13 4L7 10L13 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        العودة
+      </button>
+      
+      <div class="header-logo">
+        <div class="logo-icon">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="6" fill="#2563EB"/>
+            <path d="M10 16L14 20L22 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="16" cy="16" r="6" stroke="white" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-primary">Digital</span>
+          <span class="logo-secondary">Pass</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="selection-content">
+      <div class="selection-intro" @fadeIn>
+        <h1 class="selection-title">أهلاً وسهلاً بك في Digital Pass</h1>
+        <p class="selection-subtitle">اختر نوع حسابك للبدء</p>
+        <p class="selection-description">
+          اختر ما يناسبك من الخيارات أدناه لإنشاء حسابك والاستفادة من مميزات نظام الولاء الذكي
+        </p>
+      </div>
+
+      <!-- Selection Cards -->
+      <div class="selection-cards" @staggerAnimation>
+        <!-- Customer Card -->
+        <div class="selection-card customer-card" (click)="navigateTo('/auth/customer-register')">
+          <div class="card-decoration"></div>
+          <div class="card-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="24" fill="#3B82F6" fill-opacity="0.1"/>
+              <path d="M24 28C28.4183 28 32 24.4183 32 20C32 15.5817 28.4183 12 24 12C19.5817 12 16 15.5817 16 20C16 24.4183 19.5817 28 24 28Z" fill="#3B82F6"/>
+              <path d="M24 28C18.4772 28 14 32.4772 14 38H34C34 32.4772 29.5228 28 24 28Z" fill="#3B82F6"/>
+            </svg>
+          </div>
+          <h3 class="card-title">عميل</h3>
+          <p class="card-description">
+            أريد الاستفادة من نظام الولاء وتتبع غسلاتي
+          </p>
+          <ul class="card-features">
+            <li>بطاقة ولاء رقمية في جوالك</li>
+            <li>تتبع عدد الغسلات المتبقية</li>
+            <li>تذكير ذكي عند القرب</li>
+            <li>عروض حصرية</li>
+          </ul>
+          <button class="card-btn">
+            تسجيل كعميل
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M7 4L13 10L7 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Merchant Card -->
+        <div class="selection-card merchant-card" (click)="navigateTo('/auth/merchant-register')">
+          <div class="card-decoration"></div>
+          <div class="card-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="24" fill="#10B981" fill-opacity="0.1"/>
+              <path d="M32 20H16C14.8954 20 14 20.8954 14 22V34C14 35.1046 14.8954 36 16 36H32C33.1046 36 34 35.1046 34 34V22C34 20.8954 33.1046 20 32 20Z" fill="#10B981"/>
+              <path d="M28 16H20C19.4477 16 19 16.4477 19 17V20H29V17C29 16.4477 28.5523 16 28 16Z" fill="#10B981"/>
+              <path d="M24 28C25.1046 28 26 27.1046 26 26C26 24.8954 25.1046 24 24 24C22.8954 24 22 24.8954 22 26C22 27.1046 22.8954 28 24 28Z" fill="white"/>
+            </svg>
+          </div>
+          <h3 class="card-title">صاحب مغسلة</h3>
+          <p class="card-description">
+            أريد إدارة نظام الولاء لمغسلتي وجذب عملاء دائمين
+          </p>
+          <ul class="card-features">
+            <li>إدارة نظام الولاء الذكي</li>
+            <li>تتبع إيرادات وعملاء المغسلة</li>
+            <li>مسح QR وتصوير السيارات</li>
+            <li>تقارير وتحليلات متقدمة</li>
+          </ul>
+          <button class="card-btn">
+            تسجيل كمغسلة
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M7 4L13 10L7 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Existing User -->
+        <div class="selection-card login-card" (click)="navigateTo('/auth/signin')">
+          <div class="card-decoration"></div>
+          <div class="card-icon">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="24" fill="#8B5CF6" fill-opacity="0.1"/>
+              <path d="M24 28C27.3137 28 30 25.3137 30 22C30 18.6863 27.3137 16 24 16C20.6863 16 18 18.6863 18 22C18 25.3137 20.6863 28 24 28Z" fill="#8B5CF6"/>
+              <path d="M24 28C19.5817 28 16 31.5817 16 36H32C32 31.5817 28.4183 28 24 28Z" fill="#8B5CF6"/>
+            </svg>
+          </div>
+          <h3 class="card-title">لديك حساب بالفعل؟</h3>
+          <p class="card-description">
+            سجل الدخول إلى حسابك للاستمرار في استخدام النظام
+          </p>
+          <button class="card-btn login-btn">
+            تسجيل الدخول
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M7 4L13 10L7 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Help Text -->
+      <div class="selection-help" @fadeIn>
+        <p class="help-text">
+          تحتاج مساعدة في الاختيار؟ 
+          <a href="https://wa.me/966548290509" target="_blank" class="help-link">
+            تواصل معنا على واتساب
+          </a>
+        </p>
+      </div>
+    </main>
+  </div>
+</div>

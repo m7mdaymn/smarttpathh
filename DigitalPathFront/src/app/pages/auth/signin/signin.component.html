@@ -1,0 +1,198 @@
+<div class="signin-page" dir="rtl">
+  <!-- Background Pattern -->
+  <div class="background-pattern"></div>
+  
+  <div class="container">
+    <div class="signin-wrapper">
+      <!-- Left Column - Illustration -->
+      <div class="illustration-column" @slideIn>
+        <div class="illustration-container">
+          <div class="illustration-card">
+            <div class="illustration-content">
+              <h2 class="illustration-title">مرحباً بعودتك!</h2>
+              <p class="illustration-text">
+                سجل الدخول لتستمر في رحلة تحويل زبائنك إلى عملاء دائمين
+              </p>
+              
+              <div class="features-list">
+                <div class="feature">
+                  <div class="feature-icon">🔐</div>
+                  <div class="feature-text">
+                    <h4>حماية متقدمة</h4>
+                    <p>بياناتك محمية بأحدث تقنيات الأمان</p>
+                  </div>
+                </div>
+                <div class="feature">
+                  <div class="feature-icon">⚡</div>
+                  <div class="feature-text">
+                    <h4>وصول سريع</h4>
+                    <p>ادخل إلى لوحة التحكم في ثواني</p>
+                  </div>
+                </div>
+                <div class="feature">
+                  <div class="feature-icon">👥</div>
+                  <div class="feature-text">
+                    <h4>دعم فوري</h4>
+                    <p>فريق الدعم جاهز لمساعدتك 24/7</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Form -->
+      <div class="form-column" @fadeIn>
+        <!-- Header -->
+        <div class="form-header">
+          <button [routerLink]="['/']" class="back-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M13 4L7 10L13 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            العودة
+          </button>
+          
+          <div class="logo">
+            <div class="logo-icon">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#2563EB"/>
+                <path d="M12 16L16 20L24 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="16" cy="16" r="6" stroke="white" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="logo-text">
+              <span class="logo-primary">Digital</span>
+              <span class="logo-secondary">Pass</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+          <div class="card-header">
+            <h1 class="card-title">تسجيل الدخول</h1>
+            <p class="card-subtitle">أدخل بياناتك للوصول إلى حسابك</p>
+          </div>
+
+          <form [formGroup]="signinForm" (ngSubmit)="onSubmit()" class="signin-form">
+            <!-- Email -->
+            <div class="form-group">
+              <label class="form-label">
+                البريد الإلكتروني
+                <span class="required">*</span>
+              </label>
+              <div class="input-with-icon">
+                <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M2.5 6.66667L8.08552 10.4486C8.91343 11.0155 9.32739 11.2989 9.77447 11.4088C10.1639 11.5051 10.5694 11.5051 10.9589 11.4088C11.4059 11.2989 11.8199 11.0155 12.6478 10.4486L18.2333 6.66667M5.33333 16.6667H14.6667C16.5076 16.6667 17.4281 16.6667 18.0322 16.3215C18.5627 16.0172 18.9845 15.5954 19.2888 15.0649C19.6333 14.4608 19.6333 13.5404 19.6333 11.6994V8.96667C19.6333 7.12572 19.6333 6.20525 19.2888 5.60117C18.9845 5.07065 18.5627 4.64882 18.0322 4.34455C17.4281 4 16.5076 4 14.6667 4H5.33333C3.49238 4 2.5719 4 1.96782 4.34455C1.4373 4.64882 1.01547 5.07065 0.711202 5.60117C0.366667 6.20525 0.366667 7.12572 0.366667 8.96667V11.6994C0.366667 13.5404 0.366667 14.4608 0.711202 15.0649C1.01547 15.5954 1.4373 16.0172 1.96782 16.3215C2.5719 16.6667 3.49238 16.6667 5.33333 16.6667Z" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input
+                  type="email"
+                  formControlName="email"
+                  class="form-input"
+                  [class.error]="signinForm.get('email')?.invalid && signinForm.get('email')?.touched"
+                  placeholder="example@email.com"
+                />
+              </div>
+              <div *ngIf="signinForm.get('email')?.invalid && signinForm.get('email')?.touched" class="error-message">
+                <span *ngIf="signinForm.get('email')?.errors?.['required']">البريد الإلكتروني مطلوب</span>
+                <span *ngIf="signinForm.get('email')?.errors?.['email']">أدخل بريد إلكتروني صحيح</span>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+              <div class="form-label-row">
+                <label class="form-label">
+                  كلمة المرور
+                  <span class="required">*</span>
+                </label>
+                <button type="button" (click)="handleForgotPassword()" class="forgot-password">
+                  نسيت كلمة المرور؟
+                </button>
+              </div>
+              <div class="input-with-icon">
+                <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M15 8.33333V6.66667C15 4.08934 12.9107 2 10.3333 2C7.756 2 5.66667 4.08934 5.66667 6.66667V8.33333M10.3333 12.0833V13.75M6.5 18H14.1667C15.5474 18 16.2378 18 16.7378 17.7678C17.1828 17.5607 17.5607 17.1828 17.7678 16.7378C18 16.2378 18 15.5474 18 14.1667V12.1667C18 10.7859 18 10.0956 17.7678 9.59557C17.5607 9.15056 17.1828 8.77265 16.7378 8.56554C16.2378 8.33333 15.5474 8.33333 14.1667 8.33333H6.5C5.11929 8.33333 4.42894 8.33333 3.92893 8.56554C3.48392 8.77265 3.10601 9.15056 2.8989 9.59557C2.66667 10.0956 2.66667 10.7859 2.66667 12.1667V14.1667C2.66667 15.5474 2.66667 16.2378 2.8989 16.7378C3.10601 17.1828 3.48392 17.5607 3.92893 17.7678C4.42894 18 5.11929 18 6.5 18Z" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  formControlName="password"
+                  class="form-input"
+                  [class.error]="signinForm.get('password')?.invalid && signinForm.get('password')?.touched"
+                  placeholder="••••••••"
+                />
+                <button type="button" (click)="togglePasswordVisibility()" class="password-toggle">
+                  <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M2.5 10C2.5 10 5.22727 4.58333 10 4.58333C14.7727 4.58333 17.5 10 17.5 10C17.5 10 14.7727 15.4167 10 15.4167C5.22727 15.4167 2.5 10 2.5 10Z" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 12.0833C11.1506 12.0833 12.0833 11.1506 12.0833 10C12.0833 8.8494 11.1506 7.91667 10 7.91667C8.8494 7.91667 7.91667 8.8494 7.91667 10C7.91667 11.1506 8.8494 12.0833 10 12.0833Z" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <svg *ngIf="showPassword" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M17.5 10C17.5 10 14.7727 15.4167 10 15.4167C5.22727 15.4167 2.5 10 2.5 10M17.5 10C17.5 10 14.7727 4.58333 10 4.58333C5.22727 4.58333 2.5 10 2.5 10M17.5 10L2.5 10" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 12.0833C11.1506 12.0833 12.0833 11.1506 12.0833 10C12.0833 8.8494 11.1506 7.91667 10 7.91667C8.8494 7.91667 7.91667 8.8494 7.91667 10C7.91667 11.1506 8.8494 12.0833 10 12.0833Z" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2.5 2.5L17.5 17.5" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+              <div *ngIf="signinForm.get('password')?.invalid && signinForm.get('password')?.touched" class="error-message">
+                <span *ngIf="signinForm.get('password')?.errors?.['required']">كلمة المرور مطلوبة</span>
+                <span *ngIf="signinForm.get('password')?.errors?.['minlength']">كلمة المرور يجب أن تكون 6 أحرف على الأقل</span>
+              </div>
+            </div>
+
+            <!-- Remember Me -->
+            <div class="form-options">
+              <label class="checkbox-label">
+                <input type="checkbox" formControlName="rememberMe" class="checkbox-input">
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text">تذكرني</span>
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn" [disabled]="signinForm.invalid || isLoading">
+              <span *ngIf="!isLoading">تسجيل الدخول</span>
+              <span *ngIf="isLoading" class="loading">
+                <span class="spinner"></span>
+                جاري الدخول...
+              </span>
+            </button>
+
+
+          </form>
+
+          <!-- Divider -->
+          <div class="divider">
+            <span class="divider-text">أو</span>
+          </div>
+
+          <!-- Alternative Actions -->
+          <div class="alternative-actions">
+            <p class="register-text">
+              ليس لديك حساب؟
+              <a [routerLink]="['/auth/selection']" class="register-link">أنشئ حساب جديد</a>
+            </p>
+            
+            <button (click)="handleWhatsApp()" class="whatsapp-btn">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M2.5 17.5L3.88333 14.1667C3.03096 12.699 2.70965 10.974 2.97221 9.28946C3.23477 7.60488 4.06558 6.06688 5.31654 4.93237C6.5675 3.79787 8.16069 3.13683 9.84208 3.05961C11.5235 2.98239 13.1894 3.49378 14.556 4.50581C15.9226 5.51784 16.9022 6.96789 17.3276 8.61855C17.753 10.2692 17.5979 12.0155 16.8845 13.5728C16.1711 15.1301 14.942 16.402 13.4033 17.1764C11.8646 17.9508 10.1086 18.1811 8.41667 17.8333L2.5 17.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7.08333 7.91667C7.08333 7.91667 7.91667 6.66667 10 6.66667C12.0833 6.66667 12.9167 7.91667 12.9167 7.91667M7.5 10.8333H7.50833M10 10.8333H10.0083M12.5 10.8333H12.5083" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              تواصل مع الدعم
+            </button>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="form-footer">
+          <p class="footer-text">
+            © 2024 Digital Pass. جميع الحقوق محفوظة.
+            <a href="#" class="footer-link">الشروط والأحكام</a>
+            <span class="separator">•</span>
+            <a href="#" class="footer-link">سياسة الخصوصية</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

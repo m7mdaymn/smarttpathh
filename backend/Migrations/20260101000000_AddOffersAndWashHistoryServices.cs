@@ -1,0 +1,183 @@
+using Microsoft.EntityFrameworkCore.Migrations;
+using System;
+
+#nullable disable
+
+namespace backend.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddOffersAndWashHistoryServices : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            // Create Offer table
+            migrationBuilder.CreateTable(
+                name: "Offers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    MerchantId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DiscountValue = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    IsPercentage = table.Column<bool>(type: "bit", nullable: false),
+                    MinimumWashes = table.Column<int>(type: "int", nullable: true),
+                    MinimumAmount = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: true),
+                    ValidFrom = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ValidUntil = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UsageLimit = table.Column<int>(type: "int", nullable: true),
+                    UsagePerCustomer = table.Column<int>(type: "int", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    TimesUsed = table.Column<int>(type: "int", nullable: false),
+                    SendNotification = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Offers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Offers_Merchants_MerchantId",
+                        column: x => x.MerchantId,
+                        principalTable: "Merchants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            // Create OfferUsages table
+            migrationBuilder.CreateTable(
+                name: "OfferUsages",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    OfferId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CustomerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    WashHistoryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DiscountApplied = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OfferUsages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OfferUsages_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OfferUsages_Offers_OfferId",
+                        column: x => x.OfferId,
+                        principalTable: "Offers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OfferUsages_WashHistories_WashHistoryId",
+                        column: x => x.WashHistoryId,
+                        principalTable: "WashHistories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            // Create WashHistoryServices table
+            migrationBuilder.CreateTable(
+                name: "WashHistoryServices",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    WashHistoryId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ServiceId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ServiceName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Price = table.Column<decimal>(type: "numeric(18,2)", precision: 18, scale: 2, nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WashHistoryServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WashHistoryServices_MerchantServices_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "MerchantServices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WashHistoryServices_WashHistories_WashHistoryId",
+                        column: x => x.WashHistoryId,
+                        principalTable: "WashHistories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            // Add columns to WashHistories table
+            migrationBuilder.AddColumn<string>(
+                name: "AppliedOfferId",
+                table: "WashHistories",
+                type: "nvarchar(max)",
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "DiscountApplied",
+                table: "WashHistories",
+                type: "numeric(18,2)",
+                precision: 18,
+                scale: 2,
+                nullable: false,
+                defaultValue: 0m);
+
+            // Create indexes
+            migrationBuilder.CreateIndex(
+                name: "IX_Offers_MerchantId",
+                table: "Offers",
+                column: "MerchantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OfferUsages_CustomerId",
+                table: "OfferUsages",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OfferUsages_OfferId",
+                table: "OfferUsages",
+                column: "OfferId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OfferUsages_WashHistoryId",
+                table: "OfferUsages",
+                column: "WashHistoryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WashHistoryServices_ServiceId",
+                table: "WashHistoryServices",
+                column: "ServiceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WashHistoryServices_WashHistoryId",
+                table: "WashHistoryServices",
+                column: "WashHistoryId");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "OfferUsages");
+
+            migrationBuilder.DropTable(
+                name: "WashHistoryServices");
+
+            migrationBuilder.DropTable(
+                name: "Offers");
+
+            migrationBuilder.DropColumn(
+                name: "AppliedOfferId",
+                table: "WashHistories");
+
+            migrationBuilder.DropColumn(
+                name: "DiscountApplied",
+                table: "WashHistories");
+        }
+    }
+}

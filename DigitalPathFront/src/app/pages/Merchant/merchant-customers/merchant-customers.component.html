@@ -1,0 +1,237 @@
+<!-- Merchant Customers Management -->
+<div class="customers-container" dir="rtl">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-info">
+        <div class="header-icon">
+          <span>👥</span>
+        </div>
+        <div class="header-details">
+          <h1>إدارة العملاء</h1>
+          <p class="header-subtitle">عرض وإدارة جميع العملاء المسجلين في مغسلتك</p>
+        </div>
+      </div>
+      
+      <div class="header-stats">
+        <div class="stat-box">
+          <span class="stat-value">{{ customers().length }}</span>
+          <span class="stat-label">إجمالي العملاء</span>
+        </div>
+        <div class="stat-box active">
+          <span class="stat-value">{{ activeCustomersCount }}</span>
+          <span class="stat-label">عملاء نشطون</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>جاري تحميل العملاء...</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar" *ngIf="!isLoading()">
+    <input 
+      type="text" 
+      placeholder="🔍 ابحث عن عميل (الاسم، البريد، الهاتف)..."
+      [(ngModel)]="searchQueryValue"
+      class="search-input"
+    >
+  </div>
+
+  <!-- Customers List -->
+  <div class="customers-grid" *ngIf="!isLoading()">
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="customers().length === 0">
+      <p>📭 لا توجد عملاء حالياً</p>
+      <p class="text-secondary">ابدأ بإضافة عميل جديد لإدارة معاملاتهم</p>
+    </div>
+
+    <!-- No Results State -->
+    <div class="empty-state" *ngIf="customers().length > 0 && filteredCustomers.length === 0">
+      <p>🔍 لم يتم العثور على نتائج</p>
+      <p class="text-secondary">حاول البحث بمعايير مختلفة</p>
+    </div>
+
+    <!-- Customer Cards -->
+    <div class="customer-card" *ngFor="let customer of filteredCustomers">
+      <div class="card-header">
+        <h3>{{ customer.name }}</h3>
+        <span [class]="'badge ' + getStatusBadgeClass(customer)">
+          {{ getStatusText(customer) }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="info-row">
+          <span class="label">📧 البريد:</span>
+          <span class="value">{{ customer.email }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">📱 الهاتف:</span>
+          <span class="value">{{ customer.phone }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">📅 تاريخ الانضمام:</span>
+          <span class="value">{{ customer.joinDate | date:'medium' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">🚗 التقدم نحو المكافأة:</span>
+          <span class="value">{{ customer.currentWashes }} / {{ customer.totalWashesRequired }}</span>
+        </div>
+        <div class="info-row" *ngIf="customer.daysLeft >= 0">
+          <span class="label">⏳ أيام متبقية:</span>
+          <span class="value">{{ customer.daysLeft }} يوم</span>
+        </div>
+        <div class="info-row" *ngIf="customer.lastWash">
+          <span class="label">⏰ آخر غسلة:</span>
+          <span class="value">{{ customer.lastWash | date:'medium' }}</span>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn-secondary" (click)="openEditModal(customer)">
+          ✏️ تعديل
+        </button>
+        <button 
+          *ngIf="customer.status === 'active'" 
+          class="btn-warning" 
+          (click)="confirmDeactivate(customer)"
+        >
+          ⏸️ تعطيل
+        </button>
+        <button 
+          *ngIf="customer.status === 'inactive'" 
+          class="btn-success" 
+          (click)="confirmActivate(customer)"
+        >
+          ▶️ تفعيل
+        </button>
+        <button class="btn-danger" (click)="confirmDelete(customer)">
+          🗑️ حذف
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <div class="modal" *ngIf="showAddModal || showEditModal" [@.disable]="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>{{ showEditModal ? '✏️ تعديل العميل' : '➕ إضافة عميل جديد' }}</h2>
+        <button class="btn-close" (click)="showEditModal ? closeEditModal() : closeAddModal()">
+          ✕
+        </button>
+      </div>
+
+      <form [formGroup]="customerForm" (ngSubmit)="saveCustomer()" class="modal-body">
+        <div class="form-group">
+          <label for="name">اسم العميل *</label>
+          <input 
+            type="text" 
+            id="name"
+            formControlName="name" 
+            class="form-input"
+            placeholder="مثال: محمد أحمد"
+          >
+          <div class="error-message" *ngIf="customerForm.get('name')?.touched && customerForm.get('name')?.hasError('required')">
+            اسم العميل مطلوب
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">البريد الإلكتروني *</label>
+          <input 
+            type="email" 
+            id="email"
+            formControlName="email" 
+            class="form-input"
+            placeholder="مثال: customer@example.com"
+          >
+          <div class="error-message" *ngIf="customerForm.get('email')?.touched && customerForm.get('email')?.hasError('email')">
+            البريد الإلكتروني غير صحيح
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phone">رقم الهاتف *</label>
+          <input 
+            type="tel" 
+            id="phone"
+            formControlName="phone" 
+            class="form-input"
+            placeholder="مثال: 0551234567"
+          >
+          <div class="error-message" *ngIf="customerForm.get('phone')?.touched && customerForm.get('phone')?.hasError('pattern')">
+            رقم الهاتف غير صحيح
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="carPlate">رقم لوحة السيارة *</label>
+          <input 
+            type="text" 
+            id="carPlate"
+            formControlName="carPlate" 
+            class="form-input"
+            placeholder="مثال: ع س ع 1234"
+          >
+          <div class="error-message" *ngIf="customerForm.get('carPlate')?.touched && customerForm.get('carPlate')?.hasError('required')">
+            رقم لوحة السيارة مطلوب
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button 
+            type="button" 
+            class="btn-secondary" 
+            (click)="showEditModal ? closeEditModal() : closeAddModal()"
+          >
+            إلغاء
+          </button>
+          <button 
+            type="submit" 
+            class="btn-primary"
+            [disabled]="customerForm.invalid"
+          >
+            {{ showEditModal ? 'حفظ التعديلات' : 'إضافة العميل' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal" *ngIf="showConfirmModal">
+    <div class="modal-content confirm-modal">
+      <div class="modal-header">
+        <h2>⚠️ تأكيد</h2>
+      </div>
+
+      <div class="modal-body">
+        <p>{{ confirmMessage }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeConfirmModal()">
+          إلغاء
+        </button>
+        <button 
+          [class]="confirmAction === 'delete' ? 'btn-danger' : 'btn-warning'" 
+          (click)="executeConfirm()"
+        >
+          {{ confirmAction === 'delete' ? '🗑️ حذف' : (confirmAction === 'deactivate' ? '⏸️ تعطيل' : '▶️ تفعيل') }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Overlay -->
+  <div class="modal-overlay" *ngIf="showAddModal || showEditModal || showConfirmModal"></div>
+  </div>
+</div>

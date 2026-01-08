@@ -1,0 +1,443 @@
+<!-- merchant-setting.component.html -->
+<div class="merchant-settings-page" dir="rtl">
+  <!-- Header -->
+  <div class="settings-header">
+    <div class="header-content">
+      <div class="header-main">
+        <button class="back-btn" (click)="goBack()">← العودة</button>
+        <div class="logo-section">
+          <div class="merchant-badge">
+            <span class="badge-icon">🏪</span>
+            <span class="badge-text">إعدادات المتجر</span>
+          </div>
+          <div class="header-titles">
+            <h1 class="main-title">لوحة تحكم المغسلة</h1>
+            <p class="subtitle">إدارة متكاملة لبرنامج الولاء</p>
+          </div>
+        </div>
+        <div class="plan-status">
+          <span class="plan-badge" [ngClass]="user?.plan?.type">
+            {{ user?.plan?.type === 'pro' ? 'Pro' : 'Basic' }}
+          </span>
+          <span class="status-dot active"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <nav class="settings-tabs">
+    <button class="tab-btn"
+            [class.active]="activeTab === 'loyalty'"
+            (click)="activeTab = 'loyalty'">
+      <span class="tab-icon">🎯</span>
+      إعدادات الولاء
+    </button>
+    <button class="tab-btn"
+            [class.active]="activeTab === 'design'"
+            (click)="activeTab = 'design'">
+      <span class="tab-icon">🎨</span>
+      التصميم المخصص
+    </button>
+    <button class="tab-btn"
+            [class.active]="activeTab === 'features'"
+            (click)="activeTab = 'features'">
+      <span class="tab-icon">⚡</span>
+      الميزات المتقدمة
+    </button>
+    <button class="tab-btn"
+            [class.active]="activeTab === 'security'"
+            (click)="activeTab = 'security'">
+      <span class="tab-icon">🔒</span>
+      الأمان
+    </button>
+  </nav>
+
+  <!-- Loyalty Settings Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'loyalty'">
+    <div class="tab-header">
+      <h2>إعدادات برنامج الولاء</h2>
+      <p>تخصيص برنامج الولاء الزمني للعملاء</p>
+    </div>
+    
+    <div class="form-section">
+      <div class="form-card">
+        <div class="form-header">
+          <h3>إعدادات الولاء الأساسية</h3>
+          <span class="form-badge">مطلوب</span>
+        </div>
+        
+        <div class="loyalty-settings">
+          <!-- Required Washes -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>عدد الغسلات المطلوبة</h4>
+              <p>عدد الغسلات اللازمة للحصول على المكافأة</p>
+            </div>
+            <div class="setting-control">
+              <div class="number-input">
+                <button class="number-btn" (click)="decrementWashes()">-</button>
+                <input type="number" 
+                       [(ngModel)]="settings.reward_washes_required"
+                       class="number-field"
+                       min="3" max="20">
+                <button class="number-btn" (click)="incrementWashes()">+</button>
+              </div>
+              <span class="setting-hint">القيمة الافتراضية: 5</span>
+            </div>
+          </div>
+          
+          <!-- Time Limit -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>المدة الزمنية</h4>
+              <p>عدد الأيام لإكمال الغسلات المطلوبة</p>
+            </div>
+            <div class="setting-control">
+              <div class="number-input">
+                <button class="number-btn" (click)="decrementDays()">-</button>
+                <input type="number" 
+                       [(ngModel)]="settings.reward_time_limit_days"
+                       class="number-field"
+                       min="7" max="90">
+                <button class="number-btn" (click)="incrementDays()">+</button>
+              </div>
+              <span class="setting-hint">الأيام: {{ settings.reward_time_limit_days }} يوم</span>
+            </div>
+          </div>
+          
+          <!-- Reward Description -->
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>وصف المكافأة</h4>
+              <p>المكافأة التي يحصل عليها العميل</p>
+            </div>
+            <div class="setting-control">
+              <select [(ngModel)]="settings.reward_description" class="form-select">
+                <option value="غسلة مجانية خارجي">غسلة مجانية خارجي</option>
+                <option value="غسلة مجانية داخلي">غسلة مجانية داخلي</option>
+                <option value="تلميع مجاني">تلميع مجاني</option>
+                <option value="خصم 50%">خصم 50% على الغسلة التالية</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Anti-Fraud Protection -->
+          <div class="setting-row toggle-row">
+            <div class="setting-info">
+              <h4>حماية من الاحتيال</h4>
+              <p>منع تسجيل أكثر من غسلة لنفس العميل في اليوم</p>
+            </div>
+            <div class="setting-control">
+              <label class="toggle-switch">
+                <input type="checkbox" 
+                       [(ngModel)]="settings.anti_fraud_same_day">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-status" [ngClass]="{ 'active': settings.anti_fraud_same_day }">
+                {{ settings.anti_fraud_same_day ? 'مفعّل' : 'معطّل' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loyalty Program Pause Feature -->
+      <div class="form-card">
+        <div class="form-header">
+          <h3>توقف برنامج الولاء</h3>
+          <span class="form-badge">جديد 🆕</span>
+        </div>
+        
+        <div class="pause-section">
+          <div class="pause-control">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px;">
+              <div>
+                <h4 style="margin: 0 0 5px 0;">{{ isLoyaltyPaused ? '⏸️ برنامج موقوف' : '▶️ برنامج نشط' }}</h4>
+                <p style="margin: 0; color: #666; font-size: 14px;">
+                  {{ isLoyaltyPaused ? 'العملاء لا يمكنهم كسب النقاط حالياً' : 'العملاء يمكنهم كسب النقاط' }}
+                </p>
+              </div>
+              <button class="toggle-pause-btn" 
+                      [class.paused]="isLoyaltyPaused"
+                      (click)="toggleLoyaltyPause()" 
+                      [disabled]="saving"
+                      style="padding: 12px 30px; font-size: 16px; cursor: pointer; border: none; border-radius: 8px; font-weight: bold; transition: all 0.3s;">
+                {{ saving ? 'جاري...' : (isLoyaltyPaused ? '▶️ استئناف' : '⏸️ إيقاف') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'features'">
+    <div class="tab-header">
+      <h2>الميزات المتقدمة</h2>
+      <p>تفعيل/تعطيل الميزات الخاصة والإشعارات</p>
+    </div>
+    
+    <div class="form-section">
+      <!-- Car Photo Feature -->
+      <div class="form-card feature-card" [class.disabled-card]="merchantPlan === 'basic'">
+        <div class="feature-header">
+          <div class="feature-icon">🚗</div>
+          <div class="feature-info">
+            <h3>صور السيارات</h3>
+            <p>اسمح للعملاء برفع صور سياراتهم في بطاقات الولاء</p>
+            <div *ngIf="merchantPlan === 'basic'" class="plan-badge basic">
+              متاح في باقة Pro فقط
+            </div>
+          </div>
+          <div class="feature-toggle">
+            <label class="toggle-switch large" [class.disabled]="merchantPlan === 'basic'">
+              <input type="checkbox" 
+                     [(ngModel)]="settings.enable_car_photo"
+                     [disabled]="merchantPlan === 'basic'">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        
+        <div *ngIf="merchantPlan === 'basic'" class="plan-restriction-message">
+          <div class="restriction-icon">🔒</div>
+          <div class="restriction-text">
+            <p class="restriction-title">هذه الميزة متاحة في باقة Pro فقط</p>
+            <p class="restriction-subtitle">دع عملاءك يضيفون صور سياراتهم لزيادة التفاعل مع برنامج الولاء</p>
+            <button class="upgrade-btn" (click)="contactSupportForUpgrade()">
+              تواصل معنا لترقية الباقة
+            </button>
+          </div>
+        </div>
+
+        <div class="feature-description" *ngIf="settings.enable_car_photo && merchantPlan === 'pro'">
+          <p class="info-section">
+            <strong>كيف تعمل هذه الميزة:</strong><br>
+            عملاؤك هم من يضيفون صور سياراتهم من خلال تطبيقهم. أنت فقط تتحكم في تفعيل أو تعطيل هذه الخاصية:
+          </p>
+          
+          <div class="feature-benefits">
+            <div class="benefit">
+              <span class="benefit-icon">👤</span>
+              <span><strong>العميل:</strong> يرفع صورة سيارته من تطبيقه</span>
+            </div>
+            <div class="benefit">
+              <span class="benefit-icon">🎮</span>
+              <span><strong>أنت:</strong> تتحكم في تفعيل/تعطيل الميزة فقط</span>
+            </div>
+            <div class="benefit">
+              <span class="benefit-icon">✨</span>
+              <span><strong>النتيجة:</strong> بطاقة ولاء شخصية وفريدة لكل عميل</span>
+            </div>
+          </div>
+          
+          <div class="upload-instructions">
+            <h4>ملاحظات مهمة:</h4>
+            <ul class="important-notes">
+              <li>العميل يختار الصورة التي يريد، وليس عليك أن تفعل شيء يدوي</li>
+              <li>الصورة تظهر كأيقونة صغيرة في بطاقة ولاء العميل</li>
+              <li>يمكن للعميل تغيير الصورة في أي وقت من تطبيقه</li>
+              <li>تفعيل هذا الخيار يزيد من تفاعل العملاء مع برنامج الولاء بنسبة تصل إلى 40%</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Design Customization Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'design'">
+    <div class="tab-header">
+      <h2>التصميم المخصص</h2>
+      <p style="color: #ff6b6b; font-weight: bold;">🔜 هذه الميزة قريباً</p>
+    </div>
+    <div class="coming-soon-message" style="padding: 40px; text-align: center; background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%); border-radius: 12px; margin: 20px 0;">
+      <div style="font-size: 60px; margin-bottom: 20px;">🎨</div>
+      <h3 style="margin-bottom: 10px; color: #333;">قريباً - التصميم المخصص</h3>
+      <p style="color: #666; margin-bottom: 20px;">سيمكنك قريباً تخصيص مظهر بطاقات الولاء والعروض والألوان والشعار</p>
+      <p style="color: #999; font-size: 14px;">تابعنا للتحديثات الجديدة</p>
+    </div>
+
+  </div>
+
+  <!-- Features Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'features'">
+    <div class="tab-header">
+      <h2>الميزات المتقدمة</h2>
+      <p>تفعيل/تعطيل الميزات الخاصة والإشعارات</p>
+    </div>
+    
+    <div class="form-section">
+      <!-- Notifications -->
+      <div class="form-card feature-card" [class.disabled-card]="merchantPlan === 'basic'">
+        <div class="feature-header">
+          <div class="feature-icon">🔔</div>
+          <div class="feature-info">
+            <h3>الإشعارات الذكية</h3>
+            <p>إشعارات تلقائية للعملاء</p>
+            <div *ngIf="merchantPlan === 'basic'" class="plan-badge basic">
+              متاح في باقة Pro فقط
+            </div>
+          </div>
+          <div class="feature-toggle">
+            <label class="toggle-switch large" [class.disabled]="merchantPlan === 'basic'">
+              <input type="checkbox" 
+                     [(ngModel)]="settings.notifications_enabled"
+                     [disabled]="merchantPlan === 'basic'">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        
+        <div *ngIf="merchantPlan === 'basic'" class="plan-restriction-message">
+          <div class="restriction-icon">🔒</div>
+          <div class="restriction-text">
+            <p class="restriction-title">هذه الميزة متاحة في باقة Pro فقط</p>
+            <p class="restriction-subtitle">لتفعيل الإشعارات الذكية والاستمتاع بميزات إضافية، يرجى ترقية باقتك</p>
+            <button class="upgrade-btn" (click)="contactSupportForUpgrade()">
+              تواصل معنا لترقية الباقة
+            </button>
+          </div>
+        </div>
+
+        <div class="feature-description" *ngIf="settings.notifications_enabled && merchantPlan === 'pro'">
+          <div class="notification-templates">
+            <div class="template-group">
+              <label class="template-label">رسالة الترحيب</label>
+              <textarea [(ngModel)]="settings.notification_template_welcome"
+                        class="template-input"
+                        rows="2"
+                        placeholder="مرحباً بك! بدأت رحلة الولاء مع مغسلتنا 🚗"></textarea>
+            </div>
+            
+            <div class="template-group">
+              <label class="template-label">رسالة المتبقي</label>
+              <textarea [(ngModel)]="settings.notification_template_remaining"
+                        class="template-input"
+                        rows="2"
+                        placeholder="باقي لك غسلتين فقط للحصول على المكافأة! 💪"></textarea>
+            </div>
+            
+            <div class="template-group">
+              <label class="template-label">رسالة قرب المكافأة</label>
+              <textarea [(ngModel)]="settings.notification_template_reward_close"
+                        class="template-input"
+                        rows="2"
+                        placeholder="قريباً! باقي غسلة واحدة فقط للحصول على المكافأة 🎁"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+    </div>
+  </div>
+
+  <!-- Security Tab -->
+  <div class="tab-content" *ngIf="activeTab === 'security'">
+    <div class="tab-header">
+      <h2>الأمان والحماية</h2>
+      <p>إدارة أمان حسابك</p>
+    </div>
+    
+    <div class="form-section">
+      <div class="form-card">
+        <div class="form-header">
+          <h3>تغيير كلمة المرور</h3>
+          <span class="form-badge">مهم</span>
+        </div>
+        
+        <div class="security-settings">
+          <div class="password-form" *ngIf="showPasswordForm">
+            <div class="form-group">
+              <label class="form-label">كلمة المرور الحالية</label>
+              <div class="input-with-icon">
+                <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M15 8.33333V6.66667C15 4.08934 12.9107 2 10.3333 2C7.756 2 5.66667 4.08934 5.66667 6.66667V8.33333M10.3333 12.0833V13.75M6.5 18H14.1667C15.5474 18 16.2378 18 16.7378 17.7678C17.1828 17.5607 17.5607 17.1828 17.7678 16.7378C18 16.2378 18 15.5474 18 14.1667V12.1667C18 10.7859 18 10.0956 17.7678 9.59557C17.5607 9.15056 17.1828 8.77265 16.7378 8.56554C16.2378 8.33333 15.5474 8.33333 14.1667 8.33333H6.5C5.11929 8.33333 4.42894 8.33333 3.92893 8.56554C3.48392 8.77265 3.10601 9.15056 2.8989 9.59557C2.66667 10.0956 2.66667 10.7859 2.66667 12.1667V14.1667C2.66667 15.5474 2.66667 16.2378 2.8989 16.7378C3.10601 17.1828 3.48392 17.5607 3.92893 17.7678C4.42894 18 5.11929 18 6.5 18Z" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="password" 
+                       [(ngModel)]="passwordData.currentPassword"
+                       class="form-input"
+                       placeholder="••••••••">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">كلمة المرور الجديدة</label>
+              <div class="input-with-icon">
+                <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M15 8.33333V6.66667C15 4.08934 12.9107 2 10.3333 2C7.756 2 5.66667 4.08934 5.66667 6.66667V8.33333M10.3333 12.0833V13.75M6.5 18H14.1667C15.5474 18 16.2378 18 16.7378 17.7678C17.1828 17.5607 17.5607 17.1828 17.7678 16.7378C18 16.2378 18 15.5474 18 14.1667V12.1667C18 10.7859 18 10.0956 17.7678 9.59557C17.5607 9.15056 17.1828 8.77265 16.7378 8.56554C16.2378 8.33333 15.5474 8.33333 14.1667 8.33333H6.5C5.11929 8.33333 4.42894 8.33333 3.92893 8.56554C3.48392 8.77265 3.10601 9.15056 2.8989 9.59557C2.66667 10.0956 2.66667 10.7859 2.66667 12.1667V14.1667C2.66667 15.5474 2.66667 16.2378 2.8989 16.7378C3.10601 17.1828 3.48392 17.5607 3.92893 17.7678C4.42894 18 5.11929 18 6.5 18Z" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="password" 
+                       [(ngModel)]="passwordData.newPassword"
+                       class="form-input"
+                       placeholder="••••••••">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">تأكيد كلمة المرور</label>
+              <div class="input-with-icon">
+                <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M15 8.33333V6.66667C15 4.08934 12.9107 2 10.3333 2C7.756 2 5.66667 4.08934 5.66667 6.66667V8.33333M10.3333 12.0833V13.75M6.5 18H14.1667C15.5474 18 16.2378 18 16.7378 17.7678C17.1828 17.5607 17.5607 17.1828 17.7678 16.7378C18 16.2378 18 15.5474 18 14.1667V12.1667C18 10.7859 18 10.0956 17.7678 9.59557C17.5607 9.15056 17.1828 8.77265 16.7378 8.56554C16.2378 8.33333 15.5474 8.33333 14.1667 8.33333H6.5C5.11929 8.33333 4.42894 8.33333 3.92893 8.56554C3.48392 8.77265 3.10601 9.15056 2.8989 9.59557C2.66667 10.0956 2.66667 10.7859 2.66667 12.1667V14.1667C2.66667 15.5474 2.66667 16.2378 2.8989 16.7378C3.10601 17.1828 3.48392 17.5607 3.92893 17.7678C4.42894 18 5.11929 18 6.5 18Z" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="password" 
+                       [(ngModel)]="passwordData.confirmPassword"
+                       class="form-input"
+                       placeholder="••••••••">
+              </div>
+            </div>
+            
+            <div class="form-actions">
+              <button class="btn btn-primary" 
+                      (click)="changePassword()"
+                      [disabled]="changingPassword">
+                تغيير كلمة المرور
+              </button>
+              <button class="btn btn-secondary" 
+                      (click)="showPasswordForm = false">
+                إلغاء
+              </button>
+            </div>
+          </div>
+          
+          <div class="security-actions" *ngIf="!showPasswordForm">
+            <button class="security-btn" (click)="showPasswordForm = true">
+              <span class="btn-icon">🔑</span>
+              تغيير كلمة المرور
+            </button>
+            <button class="security-btn secondary" (click)="logoutAllSessions()">
+              <span class="btn-icon">🚪</span>
+              تسجيل الخروج من جميع الأجهزة
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save Button -->
+  <div class="save-section" *ngIf="hasChanges">
+    <div class="save-container">
+      <div class="save-info">
+        <span class="save-icon">💾</span>
+        <span class="save-text">يوجد تغييرات لم تحفظ</span>
+      </div>
+      <div class="save-actions">
+        <button class="btn btn-secondary" 
+                (click)="discardChanges()"
+                [disabled]="saving">
+          تجاهل
+        </button>
+        <button class="btn btn-primary" 
+                (click)="saveSettings()"
+                [disabled]="saving">
+          <span class="save-spinner" *ngIf="saving"></span>
+          {{ saving ? 'جاري الحفظ...' : 'حفظ التغييرات' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,281 @@
+.selection-page {
+  min-height: 100vh;
+  background: #F9FAFB;
+  direction: rtl;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Header */
+.selection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: #6B7280;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  color: #2563EB;
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.logo-primary {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1F2937;
+}
+
+.logo-secondary {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2563EB;
+}
+
+/* Main Content */
+.selection-content {
+  padding: 4rem 0;
+}
+
+.selection-intro {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 4rem;
+}
+
+.selection-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.selection-subtitle {
+  font-size: 1.25rem;
+  color: #6B7280;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.selection-description {
+  color: #6B7280;
+  line-height: 1.7;
+}
+
+/* Selection Cards */
+.selection-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media (max-width: 768px) {
+  .selection-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.selection-card {
+  background: white;
+  border-radius: 24px;
+  padding: 2.5rem;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.selection-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: #2563EB;
+}
+
+.card-decoration {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to left, #2563EB, #60A5FA);
+  border-radius: 24px 24px 0 0;
+}
+
+.customer-card .card-decoration {
+  background: linear-gradient(to left, #3B82F6, #60A5FA);
+}
+
+.merchant-card .card-decoration {
+  background: linear-gradient(to left, #10B981, #34D399);
+}
+
+.login-card .card-decoration {
+  background: linear-gradient(to left, #8B5CF6, #A78BFA);
+}
+
+.card-icon {
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.card-description {
+  color: #6B7280;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  min-height: 60px;
+}
+
+.card-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  text-align: right;
+}
+
+.card-features li {
+  color: #4B5563;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #F3F4F6;
+  position: relative;
+  padding-right: 1.5rem;
+}
+
+.card-features li:last-child {
+  border-bottom: none;
+}
+
+.card-features li::before {
+  content: '✓';
+  position: absolute;
+  right: 0;
+  color: #10B981;
+  font-weight: bold;
+}
+
+.customer-card .card-features li::before {
+  color: #3B82F6;
+}
+
+.merchant-card .card-features li::before {
+  color: #10B981;
+}
+
+.card-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #2563EB;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.card-btn:hover {
+  background: #1D4ED8;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+}
+
+.customer-card .card-btn {
+  background: #3B82F6;
+}
+
+.customer-card .card-btn:hover {
+  background: #2563EB;
+}
+
+.merchant-card .card-btn {
+  background: #10B981;
+}
+
+.merchant-card .card-btn:hover {
+  background: #059669;
+}
+
+.login-btn {
+  background: #8B5CF6;
+}
+
+.login-btn:hover {
+  background: #7C3AED;
+}
+
+/* Help Text */
+.selection-help {
+  text-align: center;
+  padding: 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.help-text {
+  color: #6B7280;
+  font-size: 1rem;
+}
+
+.help-link {
+  color: #2563EB;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.help-link:hover {
+  color: #1D4ED8;
+  text-decoration: underline;
+}

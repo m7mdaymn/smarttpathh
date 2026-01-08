@@ -1,0 +1,793 @@
+<div class="settings-page" dir="rtl">
+  <!-- Header -->
+  <header class="settings-header">
+    <div class="header-content">
+      <div class="header-main">
+        <div class="logo-section">
+          <div class="settings-badge">
+            <span class="badge-icon">⚙️</span>
+            <span class="badge-text">إعدادات المنصة</span>
+          </div>
+          <div class="header-titles">
+            <h1 class="main-title">إدارة وإعدادات النظام</h1>
+            <p class="subtitle">تهيئة ومراقبة إعدادات المنصة</p>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+        <button class="header-btn back-btn" (click)="goBack()">← العودة</button>
+
+          <button class="refresh-btn" (click)="loadSettings()">
+            <span>🔄 تحديث</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs Navigation -->
+  <nav class="settings-tabs">
+    <div class="tabs-container">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'merchants'"
+        (click)="setActiveTab('merchants')"
+      >
+        <span class="tab-icon">🏪</span>
+        <span class="tab-text">إدارة المتاجر</span>
+        <span class="tab-badge">{{ merchantsData.length }}</span>
+      </button>
+      
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'statistics'"
+        (click)="setActiveTab('statistics')"
+      >
+        <span class="tab-icon">📊</span>
+        <span class="tab-text">الإحصائيات</span>
+      </button>
+<!--       
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'platform'"
+        (click)="setActiveTab('platform')"
+      >
+        <span class="tab-icon">🛠️</span>
+        <span class="tab-text">إعدادات المنصة</span>
+      </button> -->
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="settings-content">
+    <div class="content-container">
+      <!-- Merchants Tab -->
+      <div *ngIf="activeTab === 'merchants'" class="tab-content merchants-tab">
+        <!-- Merchants Header -->
+        <div class="merchants-header">
+          <div class="merchants-title">
+            <h2>إدارة المتاجر والمشتركين</h2>
+            <p>مراقبة وإدارة جميع مغاسل السيارات المسجلة</p>
+          </div>
+          
+          <div class="merchants-stats">
+            <div class="stat-card">
+              <div class="stat-icon">🏪</div>
+              <div class="stat-content">
+                <div class="stat-value">{{ merchantsData.length }}</div>
+                <div class="stat-label">إجمالي المتاجر</div>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon">✅</div>
+              <div class="stat-content">
+                <div class="stat-value">{{ getActiveMerchantsCount() }}</div>
+                <div class="stat-label">متاجر نشطة</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Merchants Table -->
+        <div class="merchants-table-container">
+
+          <div class="table-wrapper">
+            <table class="merchants-table">
+              <thead>
+                <tr>
+                  <th>اسم المغسلة</th>
+                  <th>المالك</th>
+                  <th>المدينة</th>
+                  <th>الباقة</th>
+                  <th>العملاء</th>
+                  <th>الغسلات</th>
+                  <th>بداية الاشتراك</th>
+                  <th>نهاية الاشتراك</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let merchant of filteredMerchants()" class="table-row" [class.pending-row]="merchant.status === 'inactive' || merchant.status === 'pending' || merchant.status === 'awaiting_approval'">
+                  <td>
+                    <div class="merchant-info">
+                      <span class="merchant-name">{{ merchant.businessName }}</span>
+                      <span class="merchant-email">{{ merchant.email }}</span>
+                      <span class="merchant-phone" *ngIf="merchant.phone">{{ merchant.phone }}</span>
+                    </div>
+                  </td>
+                  <td>{{ merchant.ownerName }}</td>
+                  <td>
+                    <span class="city-badge">{{ merchant.city }}</span>
+                  </td>
+                  <td>
+                    <span class="plan-badge" [class.pro]="merchant.plan === 'pro'">
+                      {{ merchant.plan === 'pro' ? 'Pro' : 'Basic' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="customers-cell">
+                      <span class="customers-count">{{ merchant.customers }}</span>
+                      <span class="customers-trend" [class.positive]="merchant.customersGrowth > 0">
+                        {{ merchant.customersGrowth > 0 ? '+' : '' }}{{ merchant.customersGrowth }}%
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="washes-count">{{ merchant.totalWashes }}</span>
+                  </td>
+                  <td>
+                    <span class="date-badge start-date">{{ formatDate(merchant.subscriptionStartDate) }}</span>
+                  </td>
+                  <td>
+                    <span class="date-badge end-date">{{ formatDate(merchant.subscriptionEndDate) }}</span>
+                  </td>
+                  <td>
+                    <div class="status-container">
+                      <span 
+                        class="status-badge" 
+                        [class.active]="merchant.status === 'active'"
+                        [class.inactive]="merchant.status === 'inactive'"
+                        [class.suspended]="merchant.status === 'suspended'"
+                        [class.pending]="merchant.status === 'pending' || merchant.status === 'awaiting_approval'"
+                      >
+                        {{ getStatusText(merchant.status) }}
+                      </span>
+                      <span 
+                        *ngIf="merchant.isBlocked"
+                        class="status-badge blocked"
+                        title="هذا الحساب محظور ولا يمكنه تسجيل الدخول"
+                      >
+                        🚫 محظور
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button 
+                        class="action-btn edit-btn"
+                        (click)="editMerchant(merchant.id)"
+                        title="تعديل"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                          <path d="M1 13L3 11M11 1L13 3L5 11L1 13L3 9L11 1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                      <button 
+                        class="action-btn toggle-btn"
+                        [class.deactivate]="merchant.status === 'active'"
+                        [class.activate]="merchant.status !== 'active'"
+                        (click)="toggleMerchantStatus(merchant.id)"
+                        [title]="merchant.status === 'active' ? 'إيقاف الاشتراك' : 'تفعيل الاشتراك'"
+                      >
+                        <span *ngIf="merchant.status === 'active'">⏸️ إيقاف</span>
+                        <span *ngIf="merchant.status !== 'active'">✅ تفعيل</span>
+                      </button>
+                      <!-- Block/Unblock buttons - separate from subscription status -->
+                      <button 
+                        *ngIf="!merchant.isBlocked"
+                        class="action-btn block-btn"
+                        (click)="blockMerchant(merchant.id)"
+                        title="حظر الحساب - لن يتمكن من تسجيل الدخول"
+                      >
+                        🚫 حظر
+                      </button>
+                      <button 
+                        *ngIf="merchant.isBlocked"
+                        class="action-btn unblock-btn"
+                        (click)="unblockMerchant(merchant.id)"
+                        title="إلغاء حظر الحساب"
+                      >
+                        ✅ إلغاء الحظر
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div *ngIf="filteredMerchants().length === 0" class="no-results">
+              <span class="no-results-icon">🏪</span>
+              <p>لا توجد نتائج مطابقة</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Tab -->
+      <div *ngIf="activeTab === 'statistics'" class="tab-content statistics-tab">
+        <div class="statistics-header">
+          <h2>إحصائيات المنصة</h2>
+          <p>تحليل شامل لأداء المنصة وإحصائياتها</p>
+        </div>
+
+        <!-- Overview Stats -->
+        <div class="overview-stats">
+          <div class="overview-card">
+            <div class="overview-icon">🏢</div>
+            <div class="overview-content">
+              <h3>إجمالي المغاسل</h3>
+              <div class="overview-value">{{ statistics.totalBusinesses }}</div>
+              <div class="overview-detail">
+                <span class="active-count">{{ statistics.activeBusinesses }} نشط</span>
+                <span class="inactive-count">{{ statistics.inactiveBusinesses }} غير نشط</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="overview-card">
+            <div class="overview-icon">👥</div>
+            <div class="overview-content">
+              <h3>إجمالي العملاء</h3>
+              <div class="overview-value">{{ statistics.totalCustomers | number }}</div>
+              <div class="overview-detail">
+                <span class="growth-rate positive">+{{ statistics.customerGrowth }}%</span>
+                <span class="growth-label">نمو هذا الشهر</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="overview-card">
+            <div class="overview-icon">🚗</div>
+            <div class="overview-content">
+              <h3>إجمالي الغسلات</h3>
+              <div class="overview-value">{{ statistics.totalWashes | number }}</div>
+              <div class="overview-detail">
+                <span class="period-count">{{ statistics.last30DaysWashes }} آخر 30 يوم</span>
+                <span class="avg-washes">{{ statistics.avgWashesPerDay }} / يوم</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="overview-card">
+            <div class="overview-icon">🎁</div>
+            <div class="overview-content">
+              <h3>إجمالي المكافآت</h3>
+              <div class="overview-value">{{ statistics.totalRewards }}</div>
+              <div class="overview-detail">
+                <span class="redeemed-count">{{ statistics.redeemedRewards }} تم استبدالها</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan Distribution -->
+        <div class="plan-distribution">
+          <h3>توزيع الباقات</h3>
+          <div class="distribution-grid">
+            <div class="plan-card basic-plan">
+              <div class="plan-header">
+                <h4>باقة Basic</h4>
+                <span class="plan-count">{{ statistics.basicPlanCount }}</span>
+              </div>
+              <div class="plan-progress">
+                <div class="progress-bar">
+                  <div 
+                    class="progress-fill" 
+                    [style.width.%]="(statistics.basicPlanCount / statistics.totalBusinesses) * 100"
+                  ></div>
+                </div>
+                <span class="progress-percent">
+                  {{ ((statistics.basicPlanCount / statistics.totalBusinesses) * 100).toFixed(1) }}%
+                </span>
+              </div>
+            </div>
+            
+            <div class="plan-card pro-plan">
+              <div class="plan-header">
+                <h4>باقة Pro</h4>
+                <span class="plan-count">{{ statistics.proPlanCount }}</span>
+              </div>
+              <div class="plan-progress">
+                <div class="progress-bar">
+                  <div 
+                    class="progress-fill" 
+                    [style.width.%]="(statistics.proPlanCount / statistics.totalBusinesses) * 100"
+                  ></div>
+                </div>
+                <span class="progress-percent">
+                  {{ ((statistics.proPlanCount / statistics.totalBusinesses) * 100).toFixed(1) }}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Platform Settings Tab -->
+      <div *ngIf="activeTab === 'platform'" class="tab-content platform-tab">
+        <div class="platform-header">
+          <h2>إعدادات المنصة</h2>
+          <p>تهيئة إعدادات النظام والمنصة</p>
+        </div>
+
+        <!-- General Settings -->
+        <div class="settings-section">
+          <h3 class="section-title">الإعدادات العامة</h3>
+          
+          <div class="settings-grid">
+            <!-- Platform Name -->
+            <div class="setting-item">
+              <label class="setting-label">
+                اسم المنصة
+                <span class="required">*</span>
+              </label>
+              <input 
+                type="text" 
+                [(ngModel)]="platformSettings.name"
+                class="setting-input"
+                placeholder="Digital Pass"
+              >
+              <span class="setting-hint">الاسم الذي يظهر للمستخدمين</span>
+            </div>
+            
+            <!-- Support Email -->
+            <div class="setting-item">
+              <label class="setting-label">
+                بريد الدعم
+                <span class="required">*</span>
+              </label>
+              <input 
+                type="email" 
+                [(ngModel)]="platformSettings.supportEmail"
+                class="setting-input"
+                placeholder="support@digitalpass.com"
+              >
+              <span class="setting-hint">البريد الإلكتروني للدعم الفني</span>
+            </div>
+            
+            <!-- Support Phone -->
+            <div class="setting-item">
+              <label class="setting-label">
+                هاتف الدعم
+              </label>
+              <input 
+                type="tel" 
+                [(ngModel)]="platformSettings.supportPhone"
+                class="setting-input"
+                placeholder="0548290509"
+              >
+              <span class="setting-hint">رقم الهاتف للدعم</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subscription Settings -->
+        <div class="settings-section">
+          <h3 class="section-title">إعدادات الاشتراكات</h3>
+          
+          <div class="settings-grid">
+            <!-- Basic Plan Price -->
+            <div class="setting-item">
+              <label class="setting-label">
+                سعر باقة Basic
+                <span class="required">*</span>
+              </label>
+              <div class="price-input">
+                <input 
+                  type="number" 
+                  [(ngModel)]="platformSettings.basicPlanPrice"
+                  class="setting-input"
+                  min="0"
+                >
+                <span class="price-suffix">ريال / شهري</span>
+              </div>
+              <span class="setting-hint">السعر الشهري للباقة الأساسية</span>
+            </div>
+            
+            <!-- Pro Plan Price -->
+            <div class="setting-item">
+              <label class="setting-label">
+                سعر باقة Pro
+                <span class="required">*</span>
+              </label>
+              <div class="price-input">
+                <input 
+                  type="number" 
+                  [(ngModel)]="platformSettings.proPlanPrice"
+                  class="setting-input"
+                  min="0"
+                >
+                <span class="price-suffix">ريال / شهري</span>
+              </div>
+              <span class="setting-hint">السعر الشهري للباقة المتقدمة</span>
+            </div>
+            
+            <!-- Trial Period -->
+            <div class="setting-item">
+              <label class="setting-label">
+                فترة التجربة
+              </label>
+              <div class="trial-input">
+                <input 
+                  type="number" 
+                  [(ngModel)]="platformSettings.trialPeriod"
+                  class="setting-input"
+                  min="0"
+                  max="30"
+                >
+                <span class="trial-suffix">يوم</span>
+              </div>
+              <span class="setting-hint">عدد أيام التجربة المجانية (0 لإلغاء التجربة)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="settings-section">
+          <h3 class="section-title">إعدادات الإشعارات</h3>
+          
+          <div class="settings-list">
+            <!-- Email Notifications -->
+            <div class="setting-toggle">
+              <div class="toggle-content">
+                <div class="toggle-icon">📧</div>
+                <div class="toggle-text">
+                  <h4>الإشعارات البريدية</h4>
+                  <p>إرسال إشعارات عبر البريد الإلكتروني</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="platformSettings.emailNotifications"
+                  class="toggle-input"
+                >
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <!-- SMS Notifications -->
+            <div class="setting-toggle">
+              <div class="toggle-content">
+                <div class="toggle-icon">📱</div>
+                <div class="toggle-text">
+                  <h4>إشعارات SMS</h4>
+                  <p>إرسال إشعارات عبر الرسائل النصية</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="platformSettings.smsNotifications"
+                  class="toggle-input"
+                >
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <!-- Renewal Reminders -->
+            <div class="setting-toggle">
+              <div class="toggle-content">
+                <div class="toggle-icon">⏰</div>
+                <div class="toggle-text">
+                  <h4>تذكير التجديد</h4>
+                  <p>تذكير المشتركين بتجديد الاشتراك</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="platformSettings.renewalReminders"
+                  class="toggle-input"
+                >
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Maintenance Mode -->
+        <div class="settings-section">
+          <h3 class="section-title">وضع الصيانة</h3>
+          
+          <div class="maintenance-settings">
+            <div class="maintenance-toggle">
+              <div class="toggle-content">
+                <div class="toggle-icon">🔧</div>
+                <div class="toggle-text">
+                  <h4>تفعيل وضع الصيانة</h4>
+                  <p>إيقاف النظام مؤقتاً للصيانة والتحديثات</p>
+                </div>
+              </div>
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="platformSettings.maintenanceMode"
+                  class="toggle-input"
+                  (change)="onMaintenanceToggle()"
+                >
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            
+            <div *ngIf="platformSettings.maintenanceMode" class="maintenance-message">
+              <label class="setting-label">
+                رسالة الصيانة
+              </label>
+              <textarea 
+                [(ngModel)]="platformSettings.maintenanceMessage"
+                class="setting-textarea"
+                placeholder="نظام الصيانة قيد التطوير حالياً..."
+                rows="3"
+              ></textarea>
+              <span class="setting-hint">الرسالة التي تظهر للمستخدمين أثناء الصيانة</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Edit Merchant Modal -->
+  <div *ngIf="isEditModalOpen()" class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>تعديل بيانات المتجر</h2>
+        <button class="close-btn" (click)="closeEditModal()">✕</button>
+      </div>
+      
+      <form class="edit-form" (ngSubmit)="saveEditedMerchant()">
+        <div class="form-group">
+          <label for="businessName">اسم المتجر:</label>
+          <input 
+            id="businessName"
+            type="text" 
+            [(ngModel)]="editFormData().businessName"
+            name="businessName"
+            placeholder="اسم متجر السيارات"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="ownerName">اسم المالك:</label>
+          <input 
+            id="ownerName"
+            type="text" 
+            [(ngModel)]="editFormData().ownerName"
+            name="ownerName"
+            placeholder="اسم مالك المتجر"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="city">المدينة:</label>
+          <input 
+            id="city"
+            type="text" 
+            [(ngModel)]="editFormData().city"
+            name="city"
+            placeholder="اسم المدينة"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="plan">الباقة:</label>
+          <select 
+            id="plan"
+            [(ngModel)]="editFormData().plan"
+            name="plan"
+            class="form-input"
+            required
+          >
+            <option value="basic">Basic</option>
+            <option value="pro">Pro</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="cancel-btn"
+            (click)="closeEditModal()"
+            [disabled]="isSaving()"
+          >
+            إلغاء
+          </button>
+          <button 
+            type="submit" 
+            class="save-btn"
+            [disabled]="isSaving()"
+          >
+            <span *ngIf="!isSaving()">💾 حفظ التغييرات</span>
+            <span *ngIf="isSaving()" class="saving">
+              <span class="spinner"></span>
+              جاري الحفظ...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Merchant Modal -->
+  <div *ngIf="isAddModalOpen()" class="modal-overlay" (click)="closeAddModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>إضافة متجر جديد</h2>
+        <button class="close-btn" (click)="closeAddModal()">✕</button>
+      </div>
+      
+      <form class="edit-form" (ngSubmit)="saveNewMerchant()">
+        <div class="form-group">
+          <label for="addBusinessName">اسم المتجر:</label>
+          <input 
+            id="addBusinessName"
+            type="text" 
+            [(ngModel)]="addFormData().businessName"
+            name="businessName"
+            placeholder="اسم متجر السيارات"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="addOwnerName">اسم المالك:</label>
+          <input 
+            id="addOwnerName"
+            type="text" 
+            [(ngModel)]="addFormData().ownerName"
+            name="ownerName"
+            placeholder="اسم مالك المتجر"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="addEmail">البريد الإلكتروني:</label>
+          <input 
+            id="addEmail"
+            type="email" 
+            [(ngModel)]="addFormData().email"
+            name="email"
+            placeholder="البريد الإلكتروني"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="addCity">المدينة:</label>
+          <input 
+            id="addCity"
+            type="text" 
+            [(ngModel)]="addFormData().city"
+            name="city"
+            placeholder="اسم المدينة"
+            class="form-input"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="addPlan">الباقة:</label>
+          <select 
+            id="addPlan"
+            [(ngModel)]="addFormData().plan"
+            name="plan"
+            class="form-input"
+            required
+          >
+            <option value="basic">Basic</option>
+            <option value="pro">Pro</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="cancel-btn"
+            (click)="closeAddModal()"
+            [disabled]="isSaving()"
+          >
+            إلغاء
+          </button>
+          <button 
+            type="submit" 
+            class="save-btn"
+            [disabled]="isSaving()"
+          >
+            <span *ngIf="!isSaving()">➕ إضافة التاجر</span>
+            <span *ngIf="isSaving()" class="saving">
+              <span class="spinner"></span>
+              جاري الإضافة...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Activate Merchant Modal -->
+  <div *ngIf="isActivateModalOpen()" class="modal-overlay" (click)="closeActivateModal()">
+    <div class="modal-content activate-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>تفعيل الاشتراك</h2>
+        <button class="close-btn" (click)="closeActivateModal()">✕</button>
+      </div>
+      
+      <div class="activate-form">
+        <div class="form-group">
+          <label for="activationMonths">مدة الاشتراك (بالشهور):</label>
+          <select 
+            id="activationMonths"
+            [ngModel]="activationMonths()"
+            (ngModelChange)="activationMonths.set($event)"
+            name="activationMonths"
+            class="form-input months-select"
+          >
+            <option [value]="1">شهر واحد (1)</option>
+            <option [value]="2">شهرين (2)</option>
+            <option [value]="3">3 شهور</option>
+            <option [value]="6">6 شهور</option>
+            <option [value]="12">سنة كاملة (12 شهر)</option>
+            <option [value]="24">سنتين (24 شهر)</option>
+          </select>
+        </div>
+
+        <div class="subscription-preview">
+          <div class="preview-item">
+            <span class="preview-label">تاريخ البداية:</span>
+            <span class="preview-value">{{ formatDate(getCurrentDate()) }}</span>
+          </div>
+          <div class="preview-item">
+            <span class="preview-label">تاريخ الانتهاء:</span>
+            <span class="preview-value end-date-preview">{{ formatDate(getEndDate(activationMonths())) }}</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="cancel-btn"
+            (click)="closeActivateModal()"
+            [disabled]="isLoading()"
+          >
+            إلغاء
+          </button>
+          <button 
+            type="button" 
+            class="save-btn activate-btn"
+            (click)="confirmActivation()"
+            [disabled]="isLoading()"
+          >
+            <span *ngIf="!isLoading()">✅ تأكيد التفعيل</span>
+            <span *ngIf="isLoading()" class="saving">
+              <span class="spinner"></span>
+              جاري التفعيل...
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
